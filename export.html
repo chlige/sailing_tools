@@ -366,9 +366,10 @@ $(document).ready(function() {
       	     },
              dom: "Bfrtip",
 	     buttons: [ 
-	{ extend: 'excel', filename: "Regatta Exporter - Events", title: "Events" },
-	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Events", fieldBoundary: '', fieldSeparator: '\t' },
-	{ extend: 'print', title: "Events" }
+	{ extend: 'excel', filename: "Regatta Exporter - Entries", title: "Entries" },
+	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Entries", 
+		fieldBoundary: '', fieldSeparator: '\t' },
+	{ extend: 'print', title: "Entries" }
 	] });
 
 	$('#results-table').DataTable({
@@ -397,9 +398,10 @@ $(document).ready(function() {
       	     },
              dom: "Bfrtip",
 	     buttons: [ 
-	{ extend: 'excel', filename: "Regatta Exporter - Events", title: "Events" },
-	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Events", fieldBoundary: '', fieldSeparator: '\t' },
-	{ extend: 'print', title: "Events" }
+	{ extend: 'excel', filename: "Regatta Exporter - Results", title: "Results" },
+	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Results", 
+		fieldBoundary: '', fieldSeparator: '\t' },
+	{ extend: 'print', title: "Results" }
 	] });
 });
 
