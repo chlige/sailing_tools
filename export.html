@@ -58,7 +58,7 @@
             <ul class="dropdown-menu" aria-labelledby="navbarLoad">
 	      <li><a class="dropdown-item" href="#" onclick="$('#ysevents').modal('show')">YachtScoring</a></li>
 	      <li><a class="dropdown-item" href="#" onclick="$('#csevents').modal('show')">The ClubSpot</a></li>
-	      <li><a class="dropdown-item" href="#" onclick="$('#rmevents').modal('show'); RMEvent.loadTable($('#rmevent-table').DataTable());">RailMeets</a></li>
+	      <li><a class="dropdown-item" href="#" onclick="displayRMDialog()">RailMeets</a></li>
             </ul>
 	  </li>
 	  <li class="nav-item">
@@ -309,10 +309,11 @@ $(document).ready(function() {
 		order: [ [0, 'asc'] ],
 		select: { style: 'multi' },
     		columns: [
-			{ data: 'id' },
+			{ data: 'id', width:"10%" },
 	    		{ data: 'name' },
-			{ data: 'start_date', render: DataTable.render.datetime('MMM D, YYYY') },
-			{ data: 'oa' }
+			{ data: 'start_date', width: "15%",
+				render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'oa', width: "10%" }
 		],
     		rowId: 'id',
     		pageLength: 10,
@@ -460,6 +461,11 @@ function clearTables() {
 	$('#entry-table').DataTable().clear().draw();
 	$('#results-table').DataTable().clear().draw();
 	$('#clearData').modal('hide');
+}
+
+function displayRMDialog() { 
+	$('#rmevents').modal('show'); 
+	setTimeout( () => { RMEvent.loadTable($('#rmevent-table').DataTable()); }, 500 );
 }
 
 function selectRMEvents() { 
