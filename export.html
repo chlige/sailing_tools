@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 
+<title>Regatta Exporter</title>
 <!-- jQuery -->
 <script type="text/javascript"
 	src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -267,6 +268,7 @@
   </div>
 
 <script>
+
 $(document).ready(function() {
 	$('#ysevent-table').DataTable({
 		data: [],
@@ -336,8 +338,11 @@ $(document).ready(function() {
         	emptyTable: "No events loaded"
       	     },
              dom: "Bfrtip",
-		buttons: [ 'excel', 'copyHtml5', 'print' ]
-	});
+	     buttons: [ 
+	{ extend: 'excel', filename: "Regatta Exporter - Events", title: "Events" },
+	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Events", fieldBoundary: '', fieldSeparator: '\t' },
+	{ extend: 'print', title: "Events" }
+	     ]} );
 
 	$('#entry-table').DataTable({
 	     data: [],
@@ -360,8 +365,11 @@ $(document).ready(function() {
         	emptyTable: "No entries loaded"
       	     },
              dom: "Bfrtip",
-   	     buttons: [ 'excel', 'copyHtml5', 'print' ]
-	});
+	     buttons: [ 
+	{ extend: 'excel', filename: "Regatta Exporter - Events", title: "Events" },
+	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Events", fieldBoundary: '', fieldSeparator: '\t' },
+	{ extend: 'print', title: "Events" }
+	] });
 
 	$('#results-table').DataTable({
 	     data: [],
@@ -388,8 +396,11 @@ $(document).ready(function() {
         	emptyTable: "No results loaded"
       	     },
              dom: "Bfrtip",
- 	     buttons: [ 'excel', 'copyHtml5', 'print' ],
-	});
+	     buttons: [ 
+	{ extend: 'excel', filename: "Regatta Exporter - Events", title: "Events" },
+	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Events", fieldBoundary: '', fieldSeparator: '\t' },
+	{ extend: 'print', title: "Events" }
+	] });
 });
 
 function displayDuration(data, type, row, meta) {
