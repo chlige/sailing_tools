@@ -3,6 +3,7 @@ function pass(object) {
 	return object;
 }
 
+// Base class for all events (Regatta)
 class Regatta {
 	constructor(event_id, name, start_date=undefined, end_date=undefined, oa="", details={}) {
 		this.id = event_id;
@@ -11,6 +12,51 @@ class Regatta {
 		this.end_date = end_date;
 		this.oa = oa;
 		this.details = details;
+	}
+}
+
+// Base class for registered entries
+class Entry { 
+
+	constructor(event, entry_id="", sail_number="", 
+		name="", design="", owners_name="", 
+		racing_circle="", racing_division="", racing_class="", details={}) {
+
+		this.event = event;
+		this.id = entry_id;
+		this.sail_number = sail_number;
+		this.name = name;
+		this.design = design;
+		this.owners_name = owners_name;
+		this.racing_circle = racing_circle;
+		this.racing_division = racing_division;
+		this.racing_class = racing_class;
+		this.details = details;
+	}
+}
+
+// Base class for a race, used by Result class
+class Race {
+	constructor(event, race_number, distance, details={}) {
+		this.event = event;
+		this.race_number = race_number;
+		this.distance = distance;
+		this.details = details;
+	}
+}
+
+// Base class for a result
+class Result {
+
+	constructor(entry, race, result_id, elapsed_time, corrected_time, points, status, detail={}) {
+		this.entry = entry;
+		this.race = race;
+		this.result_id = result_id;
+		this.elapsed_time = elapsed_time;
+		this.corrected_time = corrected_time;
+		this.points = points;
+		this.status = status;
+		this.detail = detail;
 	}
 }
 
@@ -150,23 +196,6 @@ class YSEvent extends Regatta {
 	}
 }
 
-// Class for registered entries
-class Entry { 
-
-	constructor(event, entry_id="", sail_number="", name="", design="", owners_name="", racing_circle="", racing_division="", racing_class="", details={}) {
-		this.event = event;
-		this.id = entry_id;
-		this.sail_number = sail_number;
-		this.name = name;
-		this.design = design;
-		this.owners_name = owners_name;
-		this.racing_circle = racing_circle;
-		this.racing_division = racing_division;
-		this.racing_class = racing_class;
-		this.details = details;
-	}
-}
-
 class YSEntry extends Entry {
 	constructor(parent_event, data) { 
 		super(parent_event, data.id,
@@ -193,32 +222,9 @@ class YSEntry extends Entry {
 	}
 }
 
-class Race {
-	constructor(event, race_number, distance, details={}) {
-		this.event = event;
-		this.race_number = race_number;
-		this.distance = distance;
-		this.details = details;
-	}
-}
-
 class YSRace extends Race {
 	constructor(event, data) {
 		super(event, data.raceNumber, data.distance, data);
-	}
-}
-
-class Result {
-
-	constructor(entry, race, result_id, elapsed_time, corrected_time, points, status, detail={}) {
-		this.entry = entry;
-		this.race = race;
-		this.result_id = result_id;
-		this.elapsed_time = elapsed_time;
-		this.corrected_time = corrected_time;
-		this.points = points;
-		this.status = status;
-		this.detail = detail;
 	}
 }
 
@@ -388,31 +394,25 @@ class CSResult extends Result {
 
 
 class RMEvent extends Regatta {
-	constructor(regattaId, name, startDate, endDate, clubName) { 
-		super(regattaId, name, Date.parse(startDate), Date.parse(endDate), clubName);
+	constructor(data) {
+		super(data.id, 
+			data.name, 
+			Date.parse(data.details.startDate), 
+			Date.parse(data.details.endDate), 
+			data.club.name, 
+			data);
 		this.classes = [];
 	}
 
 	static loadTable(table) { 
 		$.ajax({
-			url: "https://railmeets.com/regattas",
+			url: "https://railmeets.com/api/v1/regattas",
 			type: "GET",
-			dataType: "html",
+			dataType: "json",
 			success: function (data, status, http) { 
 				if ( http.status==200 ) { 
-					let events = [];
-					let parsedHtml = $(data);
-					let regatta_cards = parsedHtml.find('div.regatta-listing div.regatta-box');
-					for ( const a_card of regatta_cards ) { 
-						let anchor = $(a_card).find('h2 a')[0];
-						let regattaID = anchor.href.split('/').pop();
-						let info = $(a_card).find('ul.info_list').find('li strong');
-						let dates = info[0].textContent.trim().split("\n");
-						table.row.add(new RMEvent(regattaID, anchor.textContent.trim(), 
-							dates[0], dates[2], 
-							( info.length > 1 ? info[1].textContent.trim() : "" ) ));
-					}
-					table.draw();
+					let events = data.regattas.map( (ev_data) => { return new RMEvent(ev_data); });
+					table.rows.add(events).draw();
 				}
 			},
 			error: function (http, status, error) { 
@@ -441,14 +441,13 @@ class RMEvent extends Regatta {
 
 	getResults(callback_fn=pass) {
 		let parent_event = this;
-		console.log("Getting data!!!");
 		$.ajax({
-			url: "https://railmeets.com/api/dt/regattas/" + parent_event.id + "/races",
+			url: "https://railmeets.com/api/v1/regattas/" + parent_event.id + "/results",
 			type: "GET",
 			dataType: "json",
 			success: function (data, status, http) { 
 				if ( http.status==200 ) { 
-					console.log(data);
+					data.fleetResults.forEach( (fleet_res) => { parent_event.parseFleetResults(fleet_res, callback_fn) } );
 				}
 			},
 			error: function (http, status, error) { 
@@ -457,14 +456,48 @@ class RMEvent extends Regatta {
 		});
 
 	}
+
+	parseFleetResults(fleet_data, callback_fn) {
+		const fleet_info = fleet_data.fleet;
+		fleet_info.races = [];
+		fleet_data.results.map( (a_res) => { callback_fn(this.createResults(fleet_info, a_res)); });
+	}
+
+	createResults(fleet_info, a_res) { 
+		let entry = new Entry(this, "", a_res.registration.sailNumber, 
+			a_res.registration.boatName, a_res.registration, a_res.skipperName,
+			fleet_info.division.series.name, fleet_info.division.name, fleet_info.name);
+		return a_res.raceResults.map( (res_item, i) => {
+			if (! (i in fleet_info.races) ) {
+				fleet_info.races[i] = new Race(this, i + 1, "");
+			}
+			return new RMResult(entry, fleet_info.races[i], res_item);
+		});
+	}
+
 }
 
 class RMEntry extends Entry {
 	constructor(parent_event, data) { 
 		super(parent_event, data.boatId,
-			data.sailNumber, data.boatName, data.mfrName,
-			data.skipperName,
+			data.sailNumber, data.boatName, 
+			data.mfrName, data.skipperName,
 			data.seriesName, data.divisionName, data.fleetName, data);
 		this.assignment_id = data.id;
 	}
+}
+
+
+class RMResult extends Result {
+
+	constructor(entry, race, data) {
+		super(entry, race, "",
+			moment.duration(moment(data.finish, moment.ISO_8601).diff(moment(data.start, moment.ISO_8601))),
+			moment.duration(data.corrected),
+			"", data.status, data);
+
+	}
+
+
+
 }
