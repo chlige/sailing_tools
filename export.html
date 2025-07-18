@@ -174,11 +174,20 @@
   <!-- Main content -->
   <div class="container-fluid mt-2 px-5 py-3">
 
-    <div class="mb-4 jumbotron rounded-3">
+    <div class="mb-4 rounded-3">
       <div class="container-fluid py-5">
         <h1 class="display-5"><span class="fw-bold">Regatta Exporter</span> <small class="fw-normal text-muted">v1.0</small></h1>
-	<p class="col-md-8 fs-4">Export data for regattas from YachtScoring, The ClubSpot and RailMeets.</p>
-	<a href="index.html" class="btn btn-outline-primary">Back to all tools</a>
+	<div class="col-md-8"><p class="fs-4">Export data for regattas from YachtScoring, The ClubSpot and RailMeets.</p>
+		<a href="index.html" class="btn btn-outline-primary">Back to all tools</a> 
+		<button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#help_info">More information</button>
+		<div id="help_info" class="collapse">
+			<div class="card card-body mt-2 bg-body-tertiary">
+		<ul><li>Use the <b>Load</b> menu to select events from the different regatta websites.<br>You can select more than one event from more than one platform to create a full report of various regattas.</li>
+			<li>You can then inspect the report of <i>Events</i>, <i>Entries</i> and <i>Results</i> for the selected events.<br>Data in each of the tables can be saved as a Microsoft Excel file, plain text (TSV file) or can be printed</li>
+				<li>Use the <b>Clear data</b> menu item to clear all selected data and create a new report.</li></ul>
+		</div>
+		</div>
+
       </div>
     </div>
 
@@ -367,6 +376,7 @@ $(document).ready(function() {
       	     },
              dom: "Bfrtip",
 	     buttons: [ 
+		     { extend: 'colvis', text: 'Table columns' },
 	{ extend: 'excel', filename: "Regatta Exporter - Entries", title: "Entries" },
 	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Entries", 
 		fieldBoundary: '', fieldSeparator: '\t' },
@@ -399,6 +409,7 @@ $(document).ready(function() {
       	     },
              dom: "Bfrtip",
 	     buttons: [ 
+		     { extend: 'colvis', text: 'Table columns' },
 	{ extend: 'excel', filename: "Regatta Exporter - Results", title: "Results" },
 	{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "Regatta Exporter - Results", 
 		fieldBoundary: '', fieldSeparator: '\t' },
