@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>MWPHRF Validator</title>
+<!-- jQuery -->
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous" />
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+	crossorigin="anonymous"></script>
+
+<!-- DataTables -->
+<!-- Included libraries:
+ To rebuild or modify this file with the latest versions of the included
+ software please visit:
+   https://datatables.net/download/#bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0
+
+ Included libraries:
+    JSZip 2.5.0, DataTables 1.12.1, Buttons 2.2.3, Column visibility 2.2.3, HTML5 export 2.2.3,
+ 	Print view 2.2.3, ColReorder 1.5.6, DateTime 1.1.2, FixedColumns 4.1.0, FixedHeader 3.2.4,
+ 	KeyTable 2.7.0, Responsive 2.3.0, RowGroup 1.2.0, Scroller 2.0.7, Select 1.4.0
+-->
+<link rel="stylesheet" type="text/css"
+	href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0/datatables.min.css"/>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0/datatables.min.js"></script>
+
+<script src="js/moment.min.js"></script>
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" 
+	integrity="sha512-hUhvpC5f8cgc04OZb55j0KNGh4eh7dLxd/dPSJ5VyzqDWxsayYbojWyl5Tkcgrmb/RVKCRJI1jNlRbVP4WWC4w==" 
+	crossorigin="anonymous" 
+	referrerpolicy="no-referrer"></script>
+-->
+
+<script type="text/javascript" src="js/rms.js"></script>
+<script type="text/javascript" src="js/mwphrf.js"></script>
+</head>
+
+<body class="d-flex flex-column h-100">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Results Export</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+	  <li class="nav-item dropdown">
+	    <a class="nav-link dropdown-toggle" href="#" id="navbarLoad" role="button" data-bs-toggle="dropdown" aria-expanded="false">Load</a>
+            <ul class="dropdown-menu" aria-labelledby="navbarLoad">
+	      <li><a class="dropdown-item" href="#" onclick="$('#ysevents').modal('show')">YachtScoring</a></li>
+	      <li><a class="dropdown-item" href="#" onclick="$('#csevents').modal('show')">The ClubSpot</a></li>
+	      <li><a class="dropdown-item" href="#" onclick="displayRMDialog()">RailMeets</a></li>
+            </ul>
+	  </li>
+	  <li class="nav-item dropdown">
+	    <a class="nav-link dropdown-toggle" href="#" id="navbarMWPHRF" role="button" data-bs-toggle="dropdown" aria-expanded="false">MWPHRF</a>
+            <ul class="dropdown-menu" aria-labelledby="navbarMWPHRF">
+	      <li><a class="dropdown-item" href="#" onclick="$('#mwphrf-load').modal('show')">Load Ratings from MWPRHF</a></li>
+          </ul>
+	  <li class="nav-item">
+	    <a class="nav-link" href="#" onclick="$('#clearData').modal('show')">Clear data</a>
+	</ul>
+      </div>
+    </div>
+  </nav>
+
+
+    <!-- Modal to clear data-->
+    <div class="modal fade" id="clearData" tabindex="-1" role="dialog" aria-labelledby="Clear data">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+		  <h4>Clear existing table data?</h4>
+          </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-danger' onclick="clearTables()">Confirm</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to select an event from YachtScoring -->
+    <div class="modal fade" id="ysevents" tabindex="-1" role="dialog" aria-labelledby="Select YachtScoring Event(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select YachtScoring Event(s)</h3></div>
+          <div class="modal-body">
+	    <div class="input-group">
+	      <input type="text" id="ys-search" class="form-control" placeholder="Query"/>
+	      <button class="btn btn-primary" onclick="runYSSearch()">Search</button>
+	    </div>
+	    <div class="row mt-2">
+              <table id="ysevent-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Event ID</th>
+		   <th>Name</th>
+		   <th>Dates</th>
+		   <th>OA</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="selectYSEvent()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to select an event from Clubspot -->
+    <div class="modal fade" id="csevents" tabindex="-1" role="dialog" aria-labelledby="Select The ClubSpot Event(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select The ClubSpot Event(s)</h3></div>
+          <div class="modal-body">
+	    <div class="input-group">
+	      <input type="text" id="cs-search" class="form-control" placeholder="Query"/>
+	      <button class="btn btn-primary" onclick="runCSSearch()">Search</button>
+	    </div>
+	    <div class="row mt-2">
+              <table id="csevent-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Event ID</th>
+		   <th>Name</th>
+		   <th>Dates</th>
+		   <th>OA</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="selectCSEvent()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to select an event from YachtScoring -->
+    <div class="modal fade" id="rmevents" tabindex="-1" role="dialog" aria-labelledby="Select RailMeets Event(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select RailMeets Event(s)</h3></div>
+          <div class="modal-body">
+	    <div class="row mt-2">
+              <table id="rmevent-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Event ID</th>
+		   <th>Name</th>
+		   <th>Dates</th>
+		   <th>OA</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="selectRMEvent()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to get data from MWPHRF -->
+    <div class="modal fade" id="mwphrf-load" tabindex="-1" role="dialog" aria-labelledby="Select MWPHRF Region(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select MWPHRF Region(s)</h3></div>
+          <div class="modal-body">
+	    <label for="mwphrf-region" class="form-label">Region(s)</label>
+	    <select class="form-select" id="mwphrf-region" multiple size="9">
+	      <option value="1">1 - Lake Huron</option>
+	      <option value="2">2 - Mackinac Straits through and including Port Washington</option>
+	      <option value="3">3 - From Port Washington through and including Racine WI</label>
+	      <option value="4">4 - From Racine to, but not including, Wilmette IL</label>
+	      <option value="5">5 - Wilmette to but not including Michigan City</label>
+	      <option value="6">6 - Michigan City to Little Sable Point</option>
+	      <option value="6">7 - Little Sable Point to the Straits of Mackinac</option>
+	      <option value="6">8 - Lake Superior including Sault Ste Marie MI and Canada. Areas not covered above.</option>
+	      <option value="6">9 - Western Lake Erie incl. Lake St. Clair and connecting waterways</option>
+            </select>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="getMWPHRFData()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+  <!-- Main content -->
+  <div class="container-fluid mt-2 px-5 py-3">
+
+    <div class="mb-4 rounded-3">
+      <div class="container-fluid py-5">
+        <h1 class="display-5"><span class="fw-bold">MWPHRF Validator</span> <small class="fw-normal text-muted">v1.0</small></h1>
+	<div class="col-md-8"><p class="fs-4">Validate MWPHRF ratings for entries from YachtScoring, The ClubSpot and RailMeets.</p>
+		<a href="index.html" class="btn btn-outline-primary">Back to all tools</a> 
+		<button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#help_info">More information</button>
+		<div id="help_info" class="collapse">
+			<div class="card card-body mt-2 bg-body-tertiary">
+			  <ul>
+			    <li>Use the <b>Load</b> menu to select the event from the different regatta websites.</li>
+			    <li>Use the <b>Clear data</b> menu item to clear all selected data and create a new report.</li>
+			  </ul>
+		       </div>
+		</div>
+
+      </div>
+    </div>
+
+        <div class="card">
+	    <div class="card-body">
+		    <h5 class="card-title" id="event_title"></h5>
+		    <p class="card-text" id="event_details"></p>
+	    </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col">
+        <div class="card">
+	  <div class="card-body">
+	    <h5 class="card-title">Selected Circle(s)</h5>
+	    <p class="card-text" id="sel_cirs"></p>
+	  </div>
+	</div>
+      </div>
+      <div class="col">
+        <div class="card">
+	  <div class="card-body">
+	    <h5 class="card-title">Selected Division(s)</h5>
+	    <p class="card-text" id="sel_divs"></p>
+	  </div>
+	</div>
+      </div>
+      <div class="col">
+        <div class="card">
+	  <div class="card-body">
+            <h5 class="card-title">Selected Section(s)</h5>
+	    <p class="card-text" id="sel_secs"></p>
+	  </div>
+	</div>
+      </div>
+    </div>
+
+
+   <div class="row mt-3">
+     <div class="col">
+	  <div class="container-fluid mt-3">
+              <table id="entry-table" class="table table-striped" width="100%">
+                <thead>
+	          <tr>
+		   <th>Circle</th>
+		   <th>Division</th>
+		   <th>Class</th>
+		   <th>Sail Number</th>
+		   <th>Yacht Name</th>
+		   <th>Owner</th>
+		   <th>Make Model</th>
+		   <th>ToD rating</th>
+		   <th>MWPHRF Match</th>
+		   <th>MWPHRF Rating</th>
+	         </tr>
+               </thead>
+             </table>
+	  </div>
+     </div>
+   </div>
+
+  </div>
+
+<script>
+
+$(document).ready(function() {
+	$('#ysevent-table').DataTable({
+		data: [],
+		order: [ [0, 'asc'] ],
+		select: 'single',
+    		columns: [
+			{ data: 'id' },
+	    		{ data: 'name' },
+			{ data: 'start_date', render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'oa' }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No events available" }, 
+		searching: false,
+	});
+
+	$('#csevent-table').DataTable({
+		data: [],
+		order: [ [0, 'asc'] ],
+		select: 'single',
+    		columns: [
+			{ data: 'id' },
+	    		{ data: 'name' },
+			{ data: 'start_date', render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'oa' }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No events available" }, 
+		searching: false,
+	});
+
+	$('#rmevent-table').DataTable({
+		data: [],
+		order: [ [0, 'asc'] ],
+		select: 'single',
+    		columns: [
+			{ data: 'id', width:"10%" },
+	    		{ data: 'name' },
+			{ data: 'start_date', width: "15%",
+				render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'oa', width: "10%" }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No events available" }, 
+		searching: true,
+	});
+
+	$('#entry-table').DataTable({
+	     data: [],
+	     order: [ [0, 'asc'] ],
+    	     columns: [
+		{ data: 'racing_circle' },
+		{ data: 'racing_division' },
+		{ data: 'racing_class' },
+		{ data: 'sail_number' },
+	        { data: 'name' },
+		{ data: 'owners_name' },
+		{ data: 'design' },
+		{ data: 'ratings.PHRF', defaultContent: '' },
+		{ data: 'mwphrf_data', render: displayMatches },
+		{ data: 'mwphrf_data', render: displayRating },
+	     ],
+    	     rowId: 'id',
+    	     pageLength: 50,
+    	     language: {
+        	emptyTable: "No entries loaded"
+      	     },
+             dom: "Bfrtip",
+	     buttons: [ 
+	     	{ extend: 'colvis', text: 'Table columns' },
+		{ extend: 'excel', filename: "MWPHRF Validator - Entries", title: "Entries" },
+		{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "MWPHRF Validator - Entries", 
+			fieldBoundary: '', fieldSeparator: '\t' },
+		{ extend: 'print', title: "Entries" }
+	] });
+});
+
+var all_entries = [];
+var sec_map = {};
+var all_classes = new Set();
+var all_divs = new Set();
+
+function loadEntries(entries) {
+	// Clear the selection areas
+	$('#sel_cirs').html('');
+	$('#sel_divs').html('');
+	$('#sel_secs').html('');
+	all_entries = entries;
+	sec_map = {};
+	all_classes.clear();
+	all_divs.clear();
+	entries.forEach( parseEntry );
+	// Add selection checkboxes
+	Array.from(Object.keys(sec_map)).toSorted().forEach( (val) => { make_filter('sel_cirs', 'filter_circle', val) });
+	Array.from(all_divs).toSorted().forEach( (val) => { make_filter('sel_divs', 'filter_div', val) });
+	Array.from(all_classes).toSorted().forEach( (val) => { make_filter('sel_secs', 'filter_section', val) });
+	$('#entry-table').DataTable().draw();
+}
+
+function loadEvent(ev) { 
+	$('#entry-table').DataTable().clear().draw();
+	$('#event_title').html(ev.name);
+	const date_diff = ( ev.end_date - ev.start_date ) / ( 1000 * 3600 * 24);
+	if ( date_diff >= 1 ) {
+		$('#event_details').html(ev.start_date.toLocaleDateString() + " - " + ev.end_date.toLocaleDateString() + "<br>" + ev.oa);
+	} else {
+		$('#event_details').html(ev.start_date.toLocaleDateString() + "<br>" + ev.oa);
+	}
+	ev.getEntries( loadEntries );
+}
+
+function parseEntry(entry) {
+	if ( ! (entry.racing_circle in sec_map) ) {
+		sec_map[entry.racing_circle] = { };
+		sec_map[entry.racing_circle][entry.racing_division] = new Set([ entry.racing_class]);
+	} else if ( ! (entry.racing_division in sec_map[entry.racing_circle]) ) {
+		sec_map[entry.racing_circle][entry.racing_division] = new Set([ entry.racing_class]);
+	} else {
+		sec_map[entry.racing_circle][entry.racing_division].add(entry.racing_class);
+	}
+	entry.mwphrf_data = {};
+	all_divs.add(entry.racing_division);
+	all_classes.add(entry.racing_class);
+	$('#entry-table').DataTable().row.add(entry);
+}
+
+function make_filter(div_id, sel_name, val) {
+	$('#' + div_id).append("<div class='form-check'><input class='form-check-input' type='checkbox' value='" + val +
+		"' name='" + sel_name +
+		"' onchange='filter_change();' checked><label class='form-check-label'>" + val + "</label></div>");
+}
+
+function filter_change() {
+	// Function to change the filter.
+	$('#entry-table').DataTable().clear();
+
+	let sel_circ = new Set($('input[type=checkbox][name=filter_circle]:checked').map( (i, elem) => { return elem.value; }));
+	let sel_divs = new Set($('input[type=checkbox][name=filter_div]:checked').map( (i, elem) => { return elem.value; }));
+	let sel_secs = new Set($('input[type=checkbox][name=filter_section]:checked').map( (i, elem) => { return elem.value; }));
+
+	let sel_entries = all_entries.filter( (entry) => { return sel_circ.has(entry.racing_circle) &&
+								sel_divs.has(entry.racing_division) &&
+								sel_secs.has(entry.racing_class) });
+
+	$('#entry-table').DataTable().rows.add(sel_entries).draw();
+	processStats(sel_entries);
+
+	// Disable any filters that would not make sense (parent circle or division is not selected)
+	let avail_divs = new Set();
+	let avail_secs = new Set();
+
+	sel_circ.forEach( (a_circ) => { Object.keys(sec_map[a_circ]).forEach( (a_div) => {
+			avail_divs.add(a_div);
+			if ( sel_divs.has(a_div) ) {
+				sec_map[a_circ][a_div].forEach( (a_sec) => { avail_secs.add(a_sec); });
+			}
+		})
+	});
+
+	$('input[type=checkbox][name=filter_div]').each( (i, elem) => { elem.disabled = ( ! avail_divs.has(elem.value) ) });
+	$('input[type=checkbox][name=filter_section]').each( (i, elem) => { elem.disabled = ( ! avail_secs.has(elem.value) ) });
+
+}
+
+function displayMatches(data, type, row, meta) {
+	if ( type == "display" ) {
+		return "";
+	} else {
+		return "";
+	}
+}
+
+function displayRating(data, type, row, meta) {
+	if ( type == "display" ) {
+		return "";
+	} else {
+		return "";
+	}
+}
+
+function runYSSearch() {
+	query = $('#ys-search').val();
+	$('#ysevent-table').DataTable().clear();
+	YSEvent.search(query, 1, (events) => { $('#ysevent-table').DataTable().rows.add(events).draw(); });
+}
+
+function selectYSEvent() {
+	const selrows = $('#ysevent-table').DataTable().rows({ selected: true }).data()
+	const ev = selrows[0];
+	loadEvent(ev);
+	$('#ysevents').modal('hide');
+	$('#ysevent-table').DataTable().clear().draw();
+}
+
+function runCSSearch() {
+	query = $('#cs-search').val();
+	$('#csevent-table').DataTable().clear();
+	CSEvent.search(query, (events) => { $('#csevent-table').DataTable().rows.add(events).draw(); });
+}
+
+function selectCSEvent() { 
+	const selrows = $('#csevent-table').DataTable().rows({ selected: true }).data()	
+	const ev = selrows[0];
+	loadEvent(ev);
+	$('#csevents').modal('hide');
+	$('#csevent-table').DataTable().clear().draw();
+}
+
+function displayRMDialog() { 
+	$('#rmevents').modal('show'); 
+	setTimeout( () => { RMEvent.loadTable($('#rmevent-table').DataTable()); }, 500 );
+}
+
+function selectRMEvent() { 
+	const selrows = $('#rmevent-table').DataTable().rows({ selected: true }).data()	
+	const ev = selrows[0];
+	loadEvent(ev);
+	$('#rmevents').modal('hide');
+	$('#rmevent-table').DataTable().clear().draw();
+}
+
+function clearTables() { 
+	$('#entry-table').DataTable().clear().draw();
+}
+
+var mwphrf_data = [];
+
+// Function to get data from MWRPHF
+function getMWPHRFData() {
+	$('#mwphrf-load').modal('hide');
+	regions = $('#mwphrf-region').val();
+	console.log(regions);
+	// Clear the existing mwphrf_data array
+	mwphrf_data.length = 0;
+	for ( let r=0; r < regions.length; r++ ) {
+		getMWPHRFRegion(regions[r], function(data) { mwphrf_data.push(data); });
+	}
+}
+
+</script>
+
+</body>
+</html>
