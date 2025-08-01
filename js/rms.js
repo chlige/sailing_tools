@@ -12,6 +12,7 @@ class Regatta {
 		this.end_date = end_date;
 		this.oa = oa;
 		this.details = details;
+		this.entries = {};
 	}
 }
 
@@ -20,7 +21,8 @@ class Entry {
 
 	constructor(event, entry_id="", sail_number="", 
 		name="", design="", owners_name="", 
-		racing_circle="", racing_division="", racing_class="", details={}) {
+		racing_circle="", racing_division="", racing_class="", 
+		status="", details={}) { 
 
 		this.event = event;
 		this.id = entry_id;
@@ -31,7 +33,9 @@ class Entry {
 		this.racing_circle = racing_circle;
 		this.racing_division = racing_division;
 		this.racing_class = racing_class;
+		this.status = status;
 		this.details = details;
+		this.ratings = { 'PHRF': undefined };
 	}
 }
 
@@ -96,8 +100,8 @@ class YSEvent extends Regatta {
 	}
 
 	// function to get a list of entries and return via a callback function
-	getEntries(callback_fn=pass) {
-		let parent_event = this;
+	getEntries(callback_fn=pass, store=false) {
+		const parent_event = this;
 		$.ajax({
 			url: "https://api.yachtscoring.com/v1/public/event/" + this.id + "/scratch-sheet",
 			type: "GET",
@@ -108,7 +112,11 @@ class YSEvent extends Regatta {
 			},
 			success: function (data, status, http) { 
 				if ( http.status==200 ) { 
-					callback_fn(YSEntry.parse(data, parent_event));
+					const entries = YSEntry.parse(data, parent_event);
+					if ( store ) {
+						entries.forEach( (entry) => { parent_event.entries[entry.id] = entry; });
+					}
+					callback_fn(entries);
 				}
 			},
 			error: function (http, status, error) { 
@@ -118,7 +126,7 @@ class YSEvent extends Regatta {
 	}
 
 	// Function to load the registered entries (boats) for a YS event
-	getResults(callback_fn=pass) {
+	getResults(callback_fn=pass, include_entries=false) {
 		let parent_event = this;
 		$.ajax({
 			// url: "https://api.yachtscoring.com/v1/public/event-races",
@@ -133,7 +141,7 @@ class YSEvent extends Regatta {
 			success: function (data, status, http) { 
 				if ( http.status==200 ) { 
 					parent_event.parseRaceMap(data.rows);
-					parent_event.loadAllResults(callback_fn);
+					parent_event.loadAllResults(callback_fn, include_entries);
 				}
 			},
 			error: function (http, status, error) { 
@@ -151,13 +159,13 @@ class YSEvent extends Regatta {
 	}
 	
 	// Function to load the results for a race
-	loadAllResults(callback_fn=pass) { 
+	loadAllResults(callback_fn=pass, include_entries=false) { 
 		for ( const r in this.race_map ) { 
-			this.loadRaceResults(r, callback_fn);	
+			this.loadRaceResults(r, callback_fn, include_entries);	
 		}
 	}
 
-	loadRaceResults(race, callback_fn=pass) { 
+	loadRaceResults(race, callback_fn=pass, include_entries=false) { 
 		let parent_event = this;
 		$.ajax({
 			url: "https://api.yachtscoring.com/v1/public/event/" + this.id + "/result-detail-report",
@@ -167,7 +175,7 @@ class YSEvent extends Regatta {
 			},
 			success: function (data, status, http) { 
 				if ( http.status==200 ) { 
-					callback_fn(parent_event.parseResults(data, race));
+					callback_fn(parent_event.parseResults(data, race, include_entries));
 				}
 			},
 			error: function (http, status, error) { 
@@ -176,17 +184,19 @@ class YSEvent extends Regatta {
 		});
 	}
 
-	parseResults(data, raceNumber) {
-		let allEntries = [];
+	parseResults(data, raceNumber, include_entries=false) {
+		const allEntries = [];
 		for ( const this_circle of data.data ) { 
 		  	for ( const this_div of this_circle.divisions ) { 
 				for ( const this_section of this_div.classes ) { 
-					for ( const boat of this_section.boats ) { 
-						let race = this.race_map[raceNumber][this_section.class];
-						let boatRes = new YSResult( new Entry(this, boat.eventBoatId, boat.sailNumber, 
+					for ( let boat of this_section.boats ) { 
+						const race = this.race_map[raceNumber][this_section.class];
+						const boatEntry = ( include_entries && boat.eventBoatId in this.entries ?
+							this.entries[boat.eventBoatId] :
+							new Entry(this, boat.eventBoatId, boat.sailNumber,
 								boat.name, boat.design, boat.owner.firstName + " " + boat.owner.lastName,
-								this_circle.circleName, this_div.divisionName, this_section.className),
-							race, boat);
+								this_circle.circleName, this_div.divisionName, this_section.className) );
+						const boatRes = new YSResult( boatEntry, race, boat);
 						allEntries.push(boatRes);
 					}
 				}
@@ -202,7 +212,14 @@ class YSEntry extends Entry {
 			data.sailNumber, data.name, data.design,
 			data.owner.firstName + " " + data.owner.lastName,
 			data.split.splitCircle, data.split.splitDivision,
-			data.split.splitClassName, data);
+			data.split.splitClassName, data.status, data);
+
+		if ( data.ratings != undefined ) { 
+			for ( let r=0; r < data.ratings.length; r++ ) {
+				if ( data.ratings[r].ratingType === "Rating_PHRF" )
+					this.ratings['PHRF'] = data.ratings[r].value;
+			}
+		}
 	}
 
 	// Function to parse the results from YachtScoring and return an array
@@ -256,7 +273,7 @@ class CSEvent extends Regatta {
 	}
 
 	constructor(data) { 
-		super(data.objectId, data.name, Date.parse(data.startDate.iso), Date.parse(data.endDate.iso), 
+		super(data.objectId, data.name, new Date(data.startDate.iso), new Date(data.endDate.iso), 
 			(data.clubObject != undefined ? data.clubObject.name : ""), data);
 		this.classes = [];
 	}
@@ -379,7 +396,10 @@ class CSEntry extends Entry {
 		super(parent_event, data.objectId,
 			data.sailNumber, data.boatName, data.boatType,
 			data.firstName + " " + data.lastName,
-			"", "", data.boatClassObject.name, data);
+			"", "", data.boatClassObject.name, data.status, data);
+
+		if ( data.handicap_phrf != undefined ) 
+			this.ratings['PHRF'] = data.handicap_phrf;
 	}
 }
 
@@ -397,8 +417,8 @@ class RMEvent extends Regatta {
 	constructor(data) {
 		super(data.id, 
 			data.name, 
-			Date.parse(data.details.startDate), 
-			Date.parse(data.details.endDate), 
+			new Date(data.details.startDate), 
+			new Date(data.details.endDate), 
 			data.club.name, 
 			data);
 		this.classes = [];
@@ -483,8 +503,9 @@ class RMEntry extends Entry {
 		super(parent_event, data.boatId,
 			data.sailNumber, data.boatName, 
 			data.mfrName, data.skipperName,
-			data.seriesName, data.divisionName, data.fleetName, data);
+			data.seriesName, data.divisionName, data.fleetName, data.status, data);
 		this.assignment_id = data.id;
+		this.ratings['PHRF'] = data.handicap;
 	}
 }
 
