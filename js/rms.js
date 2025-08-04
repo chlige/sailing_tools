@@ -516,7 +516,7 @@ class RMResult extends Result {
 		super(entry, race, "",
 			moment.duration(moment(data.finish, moment.ISO_8601).diff(moment(data.start, moment.ISO_8601))),
 			moment.duration(data.corrected),
-			"", data.status, data);
+			data.points, data.status, data);
 
 	}
 
