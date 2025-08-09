@@ -20,21 +20,22 @@
 
 <!-- DataTables -->
 <!-- Included libraries:
- To rebuild or modify this file with the latest versions of the included
- software please visit:
-   https://datatables.net/download/#bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0
-
- Included libraries:
-    JSZip 2.5.0, DataTables 1.12.1, Buttons 2.2.3, Column visibility 2.2.3, HTML5 export 2.2.3,
- 	Print view 2.2.3, ColReorder 1.5.6, DateTime 1.1.2, FixedColumns 4.1.0, FixedHeader 3.2.4,
- 	KeyTable 2.7.0, Responsive 2.3.0, RowGroup 1.2.0, Scroller 2.0.7, Select 1.4.0
+ * To rebuild or modify this file with the latest versions of the included
+ * software please visit:
+ *   https://datatables.net/download/#bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1
+ *
+ * Included libraries:
+ *  JSZip 3.10.1, DataTables 2.3.2, Buttons 3.2.4, Column visibility 3.2.4, HTML5 export 3.2.4, Print view 3.2.4, ColReorder 2.1.1, DateTime 1.5.6, FixedColumns 5.0.4, FixedHeader 4.0.3, KeyTable 2.12.1, Responsive 3.0.5, RowGroup 1.5.2, Scroller 2.4.3, SearchBuilder 1.8.3, SearchPanes 2.3.4, Select 3.0.1
 -->
-<link rel="stylesheet" type="text/css"
-	href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0/datatables.min.css"/>
-<script type="text/javascript"
-	src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0/datatables.min.js"></script>
+<link href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.css" rel="stylesheet" integrity="sha384-AJLr9lKaaCuSjzByAYUCZ33XS5Nl5K+kqmz154VoRrooT7qAG8f71ZhRpdXC+Cw/" crossorigin="anonymous">
+ 
+<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.js" integrity="sha384-01l+g4SkAg57RpPg0lgbZedebEdRAl+YD5+n67Mv/77+6vwyYSMEcrd1glx6eMPa" crossorigin="anonymous"></script>
+
 
 <script src="js/moment.min.js"></script>
+
+<script src="https://unpkg.com/papaparse@5.5.3/papaparse.min.js"></script>
+
 <!--
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" 
 	integrity="sha512-hUhvpC5f8cgc04OZb55j0KNGh4eh7dLxd/dPSJ5VyzqDWxsayYbojWyl5Tkcgrmb/RVKCRJI1jNlRbVP4WWC4w==" 
@@ -43,7 +44,6 @@
 -->
 
 <script type="text/javascript" src="js/rms.js"></script>
-<script type="text/javascript" src="js/mwphrf.js"></script>
 </head>
 
 <body class="d-flex flex-column h-100">
@@ -65,7 +65,9 @@
 	  <li class="nav-item dropdown">
 	    <a class="nav-link dropdown-toggle" href="#" id="navbarMWPHRF" role="button" data-bs-toggle="dropdown" aria-expanded="false">MWPHRF</a>
             <ul class="dropdown-menu" aria-labelledby="navbarMWPHRF">
-	      <li><a class="dropdown-item" href="#" onclick="$('#mwphrf-load').modal('show')">Load Ratings from MWPRHF</a></li>
+	      <!-- <li><a class="dropdown-item" href="#" onclick="$('#mwphrf-load').modal('show')">Load Ratings from MWPRHF</a></li> -->
+	      <li><a class="dropdown-item" href="#" onclick="$('#mwphrf-match').modal('show')">Find matches</a></li>
+	      <li><a class="dropdown-item" href="#" onclick="$('#mwphrf-setvar').modal('show')">Set variable</a></li>
           </ul>
 	  <li class="nav-item">
 	    <a class="nav-link" href="#" onclick="$('#clearData').modal('show')">Clear data</a>
@@ -206,6 +208,111 @@
      </div>
    </div>
 
+    <!-- Modal to set matches -->
+    <div class="modal fade" id="mwphrf-match" tabindex="-1" role="dialog" aria-labelledby="Find MWPHRF Match(es)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Find MWPHRF Match(es)</h3></div>
+          <div class="modal-body">
+	    <label class="form-label">Search by:</label>
+	    <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="sailnumber" id="match-sailnumber" checked>
+              <label class="form-check-label" for="match-sailnumber">Sail number</label>
+	    </div>
+	    <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="boatname" id="match-boatname" checked>
+              <label class="form-check-label" for="match-boatname">Boat name</label>
+	    </div>
+	    <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="makemodel" id="match-makemodel">
+              <label class="form-check-label" for="match-makemodel">Make/Model</label>
+	    </div>
+	    <div class="input-group">
+              <span class="input-group-text">Match method</span>
+              <select class="form-select" id="mwphrf-match-method">
+                <option selected value="skip">Skip previously matched entries</option>
+                <option value="add">Add to entires previously matched</option>
+                <option value="overwrite">Overwrite previous matches</option>
+              </select>
+            </div>
+            <p><i>NOTE!</i>: Will only look for matches for filtered data in the entry table</p>
+
+	    <div class="progress">
+  		<div class="progress-bar" id="mwphrf_progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+	    </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button id="mwphrf_find_btn" type='button' class='btn btn-primary' onclick="findMWPHRFMatch()">Find</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to set MWPHRF variable -->
+    <div class="modal fade" id="mwphrf-setvar" tabindex="-1" role="dialog" aria-labelledby="Set MWPHRF Variable">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Set MWPHRF Variable</h3></div>
+          <div class="modal-body">
+	    <label for="mwphrf-var" class="form-label">Ratings variable</label>
+	    <select class="form-select" id="mwphrf-var">
+	      <option>HCP</option>
+	      <option>DHCP</option>
+	      <option>NSHCP</option>
+            </select>
+            <p><i>NOTE!</i>: Will only set the MWPHRF variable for filtered data in the entry table</p>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="setMWPHRFVar()">Set</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <div class="modal fade" id="filters" tabindex="-1" role="dialog" aria-labelledby="Filter Displayed Entries">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Filter Displayed Entries</h3></div>
+          <div class="modal-body">
+            <div class="card">
+    	      <div class="card-body">
+	        <h5 class="card-title"><a href="#sel_cirs" class="btn btn-link" data-bs-toggle="collapse">Selected Circle(s)</a></h5>
+	        <p class="card-text collapse fade show" id="sel_cirs"></p>
+	      </div>
+	    </div>
+            <div class="card mt-1">
+	      <div class="card-body">
+	        <h5 class="card-title"><a href="#sel_divs" class="btn btn-link" data-bs-toggle="collapse">Selected Division(s)</a></h5>
+	        <p class="card-text collapse fade show" id="sel_divs"></p>
+	     </div>
+	   </div>
+           <div class="card mt-1">
+	     <div class="card-body">
+               <h5 class="card-title"><a href="#sel_secs" class="btn btn-link" data-bs-toggle="collapse">Selected Section(s)</a></h5>
+	       <p class="card-text collapse fade show" id="sel_secs"></p>
+	     </div>
+	   </div>
+           <div class="card mt-1">
+	     <div class="card-body">
+	       <p class="card-text">
+		<div class='form-check'>
+                  <input class='form-check-input' type='checkbox' value='invalid' name='filter_invalid'>
+                  <label class='form-check-label'>Only invalid</label>
+                </div>
+		</p>
+	     </div>
+	   </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="filter_change()">Set</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
   <!-- Main content -->
   <div class="container-fluid mt-2 px-5 py-3">
 
@@ -234,34 +341,6 @@
 	    </div>
     </div>
 
-    <div class="row mt-3">
-      <div class="col">
-        <div class="card">
-	  <div class="card-body">
-	    <h5 class="card-title">Selected Circle(s)</h5>
-	    <p class="card-text" id="sel_cirs"></p>
-	  </div>
-	</div>
-      </div>
-      <div class="col">
-        <div class="card">
-	  <div class="card-body">
-	    <h5 class="card-title">Selected Division(s)</h5>
-	    <p class="card-text" id="sel_divs"></p>
-	  </div>
-	</div>
-      </div>
-      <div class="col">
-        <div class="card">
-	  <div class="card-body">
-            <h5 class="card-title">Selected Section(s)</h5>
-	    <p class="card-text" id="sel_secs"></p>
-	  </div>
-	</div>
-      </div>
-    </div>
-
-
    <div class="row mt-3">
      <div class="col">
 	  <div class="container-fluid mt-3">
@@ -278,6 +357,7 @@
 		   <th>Requested rating</th>
 		   <th>MWPHRF Match</th>
 		   <th>MWPHRF Rating</th>
+		   <th>Valid</th>
 	         </tr>
                </thead>
              </table>
@@ -288,6 +368,11 @@
   </div>
 
 <script>
+var mwphrf_data = { by_name: {}, by_sail: {}, by_makemodel: {}, all_data: []};
+var all_entries = [];
+var sec_map = {};
+var all_classes = new Set();
+var all_divs = new Set();
 
 $(document).ready(function() {
 	$('#ysevent-table').DataTable({
@@ -354,8 +439,9 @@ $(document).ready(function() {
 		{ data: 'owners_name' },
 		{ data: 'design' },
 		{ data: 'ratings.PHRF', defaultContent: '' },
-		{ data: 'mwphrf_data', render: displayMatches },
-		{ data: 'mwphrf_data', render: displayRating },
+		{ data: 'mwphrf_matches', render: displayMatches },
+		{ data: 'mwphrf_selected', render: displayRating },
+		{ data: 'mwphrf_selected', render: displayValid }
 	     ],
     	     rowId: 'id',
     	     pageLength: 50,
@@ -365,17 +451,43 @@ $(document).ready(function() {
              dom: "Bfrtip",
 	     buttons: [ 
 	     	{ extend: 'colvis', text: 'Table columns' },
+                { text: 'Filter', action: function (e, dt, node, config) { bootstrap.Modal.getOrCreateInstance(document.querySelector('#filters')).show() } },
 		{ extend: 'excel', filename: "MWPHRF Validator - Entries", title: "Entries" },
 		{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "MWPHRF Validator - Entries", 
 			fieldBoundary: '', fieldSeparator: '\t' },
 		{ extend: 'print', title: "Entries" }
 	] });
+
+	loadMWPHRFData();
 });
 
-var all_entries = [];
-var sec_map = {};
-var all_classes = new Set();
-var all_divs = new Set();
+function loadMWPHRFData() {
+        $.ajax({
+                url: "http://mwphrfexport.dnsalias.org/MWPHRF_Certificates.csv",
+                type: "GET",
+                success: function (data, status, http) {
+                        if ( http.status==200 ) {
+        			const csv = Papa.parse(data, { header: true });
+				csv.data.forEach( parseCert );
+                        }
+                },
+                error: function (http, status, error) {
+                        alert(status);
+                }
+        });
+}
+	
+function parseCert(cert) {
+	cert.sailno_int = cert.sailno.replace(/\D/g, ''); 
+	cert.yacht_name in mwphrf_data.by_name ? mwphrf_data.by_name[cert.yacht_name].push(cert) : mwphrf_data.by_name[cert.yacht_name] = [ cert ];
+	cert.sailno_int in mwphrf_data.by_sail ? mwphrf_data.by_sail[cert.sailno_int].push(cert) : mwphrf_data.by_sail[cert.sailno_int] = [ cert ];
+	cert.type_class in mwphrf_data.by_makemodel ? mwphrf_data.by_makemodel[cert.type_class].push(cert) : mwphrf_data.by_makemodel[cert.type_class] = [ cert ];
+	cert.DHCP = parseInt(cert.dhcp)
+	cert.BHCP = parseInt(cert.bhcp)
+	cert.HCP = parseInt(cert.hcp)
+	cert.NSHCP = parseInt(cert.nshcp)
+	mwphrf_data.all_data.push(cert);
+}
 
 function loadEntries(entries) {
 	// Clear the selection areas
@@ -415,7 +527,9 @@ function parseEntry(entry) {
 	} else {
 		sec_map[entry.racing_circle][entry.racing_division].add(entry.racing_class);
 	}
-	entry.mwphrf_data = {};
+	entry.mwphrf_matches = new Set();
+	entry.mwphrf_selected = null;
+	entry.mwphrf_var = null;
 	all_divs.add(entry.racing_division);
 	all_classes.add(entry.racing_class);
 	$('#entry-table').DataTable().row.add(entry);
@@ -423,8 +537,7 @@ function parseEntry(entry) {
 
 function make_filter(div_id, sel_name, val) {
 	$('#' + div_id).append("<div class='form-check'><input class='form-check-input' type='checkbox' value='" + val +
-		"' name='" + sel_name +
-		"' onchange='filter_change();' checked><label class='form-check-label'>" + val + "</label></div>");
+		"' name='" + sel_name + "' checked><label class='form-check-label'>" + val + "</label></div>");
 }
 
 function filter_change() {
@@ -435,12 +548,14 @@ function filter_change() {
 	let sel_divs = new Set($('input[type=checkbox][name=filter_div]:checked').map( (i, elem) => { return elem.value; }));
 	let sel_secs = new Set($('input[type=checkbox][name=filter_section]:checked').map( (i, elem) => { return elem.value; }));
 
-	let sel_entries = all_entries.filter( (entry) => { return sel_circ.has(entry.racing_circle) &&
-								sel_divs.has(entry.racing_division) &&
-								sel_secs.has(entry.racing_class) });
+	let show_all = $('input[name=filter_invalid]:checked').val() !== "invalid";
 
-	$('#entry-table').DataTable().rows.add(sel_entries).draw();
-	processStats(sel_entries);
+	const entry_table = $('#entry-table').DataTable();
+
+	entry_table.search.fixed('filters', (row, entry) => { return sel_circ.has(entry.racing_circle) &&
+								sel_divs.has(entry.racing_division) &&
+								sel_secs.has(entry.racing_class) &&
+								( show_all || isValid(entry) )  }).draw();
 
 	// Disable any filters that would not make sense (parent circle or division is not selected)
 	let avail_divs = new Set();
@@ -457,23 +572,47 @@ function filter_change() {
 	$('input[type=checkbox][name=filter_div]').each( (i, elem) => { elem.disabled = ( ! avail_divs.has(elem.value) ) });
 	$('input[type=checkbox][name=filter_section]').each( (i, elem) => { elem.disabled = ( ! avail_secs.has(elem.value) ) });
 
+	bootstrap.Modal.getOrCreateInstance(document.querySelector('#filters')).hide();
 }
 
 function displayMatches(data, type, row, meta) {
 	if ( type == "display" ) {
-		return "";
-	} else {
-		return "";
+		const badge_class = data.size == 1 ? "bg-info" : ( data.size > 1 ? "bg-warning" : "bg-danger" );
+		return `<span class="badge ${badge_class}">${data.size}</span>`;
 	}
+	return data.size;
 }
 
 function displayRating(data, type, row, meta) {
 	if ( type == "display" ) {
-		return "";
+		return data != undefined && row.mwphrf_var != undefined ?
+			data[ row.mwphrf_var ] + " (" + row.mwphrf_var + ")" :
+			"";
 	} else {
-		return "";
+		return data != undefined && row.mwphrf_var != undefined ?
+			data[ row.mwphrf_var ] :
+			null
 	}
 }
+
+function displayValid(data, type, row, meta) {
+	const cert_var = data != undefined && row.mwphrf_var != undefined ? 
+			data[ row.mwphrf_var ] : null;
+	const is_valid = row.ratings.PHRF != undefined && row.ratings.PHRF === cert_var;
+	if ( type == "display" ) {
+		const badge_class = is_valid ? "bg-success" : "bg-danger";
+		return `<span class="badge rounded-pill ${badge_class}">${is_valid}</span>`;
+	} else {
+		return is_valid;
+	}
+}
+
+function isValid(entry) { 
+	const cert_var = entry.mwphrf_selected != undefined && entry.mwphrf_var != undefined ? 
+			entry.mwphrf_selected[ entry.mwphrf_var ] : null;
+	return entry.ratings.PHRF != undefined && entry.ratings.PHRF === cert_var;
+}
+
 
 function runYSSearch() {
 	query = $('#ys-search').val();
@@ -518,10 +657,50 @@ function selectRMEvent() {
 
 function clearTables() { 
 	$('#entry-table').DataTable().clear().draw();
+	$('#clearData').modal('hide');
 }
 
-var mwphrf_data = [];
+// Function to find MWPHRF matches
+function findMWPHRFMatch() {
+	$('#mwphrf_find_btn').prop('disabled', true);
+	let match_types = [];
+	$('input[name="mwphrf-match"]:checked').each( function () { match_types.push($(this).val()); });
+	let match_method = $('#mwphrf-match-method').val();
+	let entry_len = $('#entry-table').DataTable().data().length;
+	$('#entry-table').DataTable().data().each( (entry, idx) => { makeMWPHRFMatch(entry, match_types, match_method); 
+		$('#mwphrf_progress').width = ((idx / entry_len) * 100 ) + "%";
+		$('#mwphrf_progress').html = idx + " of " + entry_len; } );
+	// All the enties are complete
+	$('#entry-table').DataTable().rows().invalidate().draw();
+	$('#mwphrf_find_btn').prop('disabled', false);
+	$('#mwphrf-match').modal('hide');
+}
 
+function makeMWPHRFMatch(entry, match_types, match_method) {
+	if ( match_method == "skip" && entry.mwphrf_matches.size > 0 ) 
+		return;
+	let matches = match_types.map( (a_type) => { switch (a_type) { 
+		case "sailnumber": return mwphrf_data.by_sail[entry.sail_number.replace(/\D/g, '')];
+		case "boatname": return mwphrf_data.by_name[entry.name];
+		case "makemodel": return mwphrf_data.by_makemodel[entry.design];
+	} }).flat().filter( (item) => item != undefined );
+	if ( match_method == "overwrite" ) 
+		entry.mwphrf_matches.clear();
+	if ( matches.length > 0 ) { 
+		entry.mwphrf_matches.add(...matches);
+		// If there is only one match, then set it as the selected one.
+		if ( entry.mwphrf_matches.size == 1 ) 
+			entry.mwphrf_selected = entry.mwphrf_matches.values().next().value;
+	}
+}
+
+// function to set MWPHRF variables
+function setMWPHRFVar() {
+	let sel_var = $('#mwphrf-var').val();
+	$('#entry-table').DataTable().data().each( (entry, idx) => { entry.mwphrf_var = sel_var; } );
+	$('#entry-table').DataTable().rows().invalidate().draw();
+	$('#mwphrf-setvar').modal('hide');
+}
 // Function to get data from MWRPHF
 function getMWPHRFData() {
 	$('#mwphrf-load').modal('hide');
@@ -529,9 +708,12 @@ function getMWPHRFData() {
 	console.log(regions);
 	// Clear the existing mwphrf_data array
 	mwphrf_data.length = 0;
+
+	/*
 	for ( let r=0; r < regions.length; r++ ) {
 		getMWPHRFRegion(regions[r], function(data) { mwphrf_data.push(data); });
 	}
+	*/
 }
 
 </script>
