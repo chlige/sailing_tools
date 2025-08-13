@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>Registration Example</title>
+<!-- jQuery -->
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous" />
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+	crossorigin="anonymous"></script>
+
+<!-- DataTables -->
+<!-- Included libraries:
+ * To rebuild or modify this file with the latest versions of the included
+ * software please visit:
+ *   https://datatables.net/download/#bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1
+ *
+ * Included libraries:
+ *  JSZip 3.10.1, DataTables 2.3.2, Buttons 3.2.4, Column visibility 3.2.4, HTML5 export 3.2.4, Print view 3.2.4, ColReorder 2.1.1, DateTime 1.5.6, FixedColumns 5.0.4, FixedHeader 4.0.3, KeyTable 2.12.1, Responsive 3.0.5, RowGroup 1.5.2, Scroller 2.4.3, SearchBuilder 1.8.3, SearchPanes 2.3.4, Select 3.0.1
+-->
+<link href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.css" rel="stylesheet" integrity="sha384-AJLr9lKaaCuSjzByAYUCZ33XS5Nl5K+kqmz154VoRrooT7qAG8f71ZhRpdXC+Cw/" crossorigin="anonymous">
+ 
+<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.js" integrity="sha384-01l+g4SkAg57RpPg0lgbZedebEdRAl+YD5+n67Mv/77+6vwyYSMEcrd1glx6eMPa" crossorigin="anonymous"></script>
+
+
+<script src="js/moment.min.js"></script>
+<script src="js/mwphrf.js"></script>
+
+<script src="https://unpkg.com/papaparse@5.5.3/papaparse.min.js"></script>
+
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js" 
+	integrity="sha512-hUhvpC5f8cgc04OZb55j0KNGh4eh7dLxd/dPSJ5VyzqDWxsayYbojWyl5Tkcgrmb/RVKCRJI1jNlRbVP4WWC4w==" 
+	crossorigin="anonymous" 
+	referrerpolicy="no-referrer"></script>
+-->
+
+<script type="text/javascript" src="js/rms.js"></script>
+</head>
+
+<body class="d-flex flex-column h-100">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Example</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      </div>
+    </div>
+  </nav>
+
+    <!-- Modal to find MWPHRF certs -->
+    <div class="modal fade" id="mwphrf-match" tabindex="-1" role="dialog" aria-labelledby="Find MWPHRF Match(es)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Find MWPHRF certificates</h3></div>
+          <div class="modal-body">
+		  <div class="input-group">
+	    		<label class="input-group-text">Search by:</label>
+			<select class="form-select" id="mwphrf-match-type" onchange="setMatchType(this)" style="width:5em">
+				<option value="sail" selected>Sail number</option>
+				<option value="name">Yacht name</option>
+				<option value="type">Make-model</option>
+			</select>
+			<input type="text" class="form-control w-50" id="mwphrf-query">
+	    		<button class="btn btn-primary" type="button" onclick="findMWPHRFCert()">Search</button>
+		  </div>
+
+	    <div class="row mt-2">
+              <table id="cert-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Sail #</th>
+		   <th>Yacht name</th>
+		   <th>Make-model</th>
+		   <th>Issued on</th>
+		   <th>BHCP</th>
+		   <th>HCP</th>
+		   <th>DHCP</th>
+		   <th>NSHCP</th>
+		   <th>Link</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button id="mwphrf_find_btn" type='button' class='btn btn-primary' onclick="setMatch()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+  <!-- Main content -->
+  <div class="container-fluid mt-2 px-5 py-3">
+
+    <div class="mb-4 rounded-3">
+      <div class="container-fluid py-5">
+	      <h1 class="display-5"><span class="fw-bold">Regatta Registration</span> <small class="fw-normal text-muted">Example</small></h1>
+	<div class="col-md-8"><p class="fs-4">Example registration form integrating MWPHRF data.</p>
+		<button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#help_info">More information</button>
+		<div id="help_info" class="collapse">
+			<div class="card card-body mt-2 bg-body-tertiary">
+			  <ul>
+				  <li>Enter your basic information, e.g. your name, boat name, sail number.</li>
+				  <li>Then use <b>Find Certificate</b> to import your certificate from MWPHRF
+					  <ol>
+						  <li>Set the <i>Search by</i> to find your certificate by sail number or yacht name.</li>
+						  <li>Click <b>Search</b> to search for valid certificates</li>
+						  <li>Select the desired certificate from the list of matched certificates</li>
+						  <li>Click <b>Select</b> to set the desired certificate</li>
+				  </li>
+
+			  </ul>
+		       </div>
+		</div>
+      </div>
+    </div>
+
+   <div class="row mt-3">
+     <div class="col">
+	  <div class="card">
+		  <div class="card-body">
+	 	<h5 class="card-title">Basic Information</h5>
+	  <label for="skipper_name" class="form-label">Skipper Name</label>
+	  <input type="text" id="skipper_name" name="skipper_name" class="form-control">
+
+	  <label for="skipper_email" class="form-label">Email address</label>
+	  <input type="text" id="skipper_email" name="skipper_email" class="form-control">
+
+	  <label for="skipper_phone" class="form-label">Phone number</label>
+	  <input type="text" id="skipper_phone" name="skipper_phone" class="form-control">
+		  </div>
+	  </div>
+     </div>
+     <div class="col">
+	  <div class="card">
+		  <div class="card-body">
+	 	<h5 class="card-title">Boat Information</h5>
+
+	  <label for="boat_name" class="form-label">Yacht Name</label>
+	  <input type="text" id="boat_name" name="boat_name" class="form-control">
+
+	  <label for="sail_number" class="form-label">Sail Number</label>
+	  <input type="text" id="sail_number" name="sail_number" class="form-control">
+
+	  <label for="make_model" class="form-label">Boat Make/Model</label>
+	  <input type="text" id="make_model" name="make_model" class="form-control">
+
+	  <label for="cert-details" class="form-label">Certificate</label>
+	  <div class="input-group">
+		<input type="text" id="cert-details" class="form-control" readonly>
+	  	<button class="btn btn-info" onclick="showMatchModal()">Find Certificate</button>
+	  </div>
+
+		  </div>
+	  </div>
+     </div>
+   </div>
+
+  </div>
+
+<script>
+
+var sel_cert;
+
+$(document).ready(function() {
+	$('#cert-table').DataTable({
+		data: [],
+		order: [ [0, 'asc'] ],
+		select: 'single',
+    		columns: [
+	    		{ data: 'sailNo' },
+	    		{ data: 'yachtName' },
+	    		{ data: 'makeModel' },
+			{ data: 'issueDate', render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'bhcp' },
+			{ data: 'hcp' },
+			{ data: 'dhcp' },
+			{ data: 'nshcp' },
+			{ data: 'certificateUrl', render: displayURL }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No certificates available" }, 
+		searching: false,
+	});
+
+});
+
+function setMatch() {
+	const selrows = $('#cert-table').DataTable().rows({ selected: true }).data()
+	sel_cert = selrows[0];
+	$('#mwphrf-match').modal('hide');
+	$('#cert-details').val(`Certificate issued ${sel_cert.issueDate} - HCP: ${sel_cert.hcp}, DHCP: ${sel_cert.dhcp}, NSHCP: ${sel_cert.nshcp}`);
+
+}
+
+// Function to set the match type
+function setMatchType(sel_elem) { 
+	const match_type = sel_elem.value;
+	switch ( match_type ) { 
+		case 'sail': $('#mwphrf-query').val($('#sail_number').val()); break;
+		case 'name': $('#mwphrf-query').val($('#boat_name').val()); break;
+		case 'type': $('#mwphrf-query').val($('#make_model').val()); break;
+	}
+
+}
+
+// Function to display the Certificate link in the table
+function displayURL(data, type, row, meta) {
+        if ( type == "display" ) {
+		return `<a class="btn btn-info" href="${data}" target="_blank">View</a>`;
+        }
+        return data;
+}
+
+// Function to find MWPHRF matches
+function findMWPHRFCert() {
+	const cert_table = $('#cert-table').DataTable();
+	cert_table.clear().draw();
+	const match_type = $('#mwphrf-match-type').val();
+	const match_query = ( match_type == "sail" ?  $('#mwphrf-query').val().replace(/\D/g, '') : $('#mwphrf-query').val() );
+	searchMWPHRF(match_type, match_query, (matches) => { addMWPHRFMatch(cert_table, matches, true) })
+}
+
+function addMWPHRFMatch(cert_table, matches, current_year=false) { 
+	if ( matches.length > 0 ) { 
+		if ( current_year ) {
+			const this_year = new Date().getFullYear().toString();
+			matches.forEach( (item) => { if ( item.validFor.toString() === this_year ) cert_table.row.add(item); });
+		} else {
+			cert_table.rows.add(matches);
+		}
+	}
+	cert_table.draw();
+}
+
+function showMatchModal() { 
+	$('#mwphrf-match').modal('show');
+	setMatchType(document.getElementById('mwphrf-match-type'));
+}
+</script>
+
+</body>
+</html>
