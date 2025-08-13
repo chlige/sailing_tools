@@ -33,6 +33,7 @@
 
 
 <script src="js/moment.min.js"></script>
+<script src="js/mwphrf.js"></script>
 
 <script src="https://unpkg.com/papaparse@5.5.3/papaparse.min.js"></script>
 
@@ -216,15 +217,15 @@
           <div class="modal-body">
 	    <label class="form-label">Search by:</label>
 	    <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="sailnumber" id="match-sailnumber" checked>
+              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="sail" id="match-sailnumber" checked>
               <label class="form-check-label" for="match-sailnumber">Sail number</label>
 	    </div>
 	    <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="boatname" id="match-boatname" checked>
+              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="name" id="match-boatname" checked>
               <label class="form-check-label" for="match-boatname">Boat name</label>
 	    </div>
 	    <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="makemodel" id="match-makemodel">
+              <input class="form-check-input" type="checkbox" name="mwphrf-match" value="type" id="match-makemodel">
               <label class="form-check-label" for="match-makemodel">Make/Model</label>
 	    </div>
 	    <div class="input-group">
@@ -235,8 +236,13 @@
                 <option value="overwrite">Overwrite previous matches</option>
               </select>
             </div>
-            <p><i>NOTE!</i>: Will only look for matches for filtered data in the entry table</p>
 
+	    <p>
+              <input class="form-check-input" type="checkbox" name="mwphrf-year" value="current" id="match-year" checked>
+              <label class="form-check-label" for="match-year">Only match certificates for current year</label>
+	    </p>
+
+            <p><i>NOTE!</i>: Will only look for matches for filtered data in the entry table</p>
 	    <div class="progress">
   		<div class="progress-bar" id="mwphrf_progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 	    </div>
@@ -266,6 +272,37 @@
          <div class="modal-footer">
            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
            <button type='button' class='btn btn-primary' onclick="setMWPHRFVar()">Set</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+   <!-- Modal to set selected cert for a entry -->
+    <div class="modal fade" id="sel_cert" tabindex="-1" role="dialog" aria-labelledby="Select The ClubSpot Event(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select The ClubSpot Event(s)</h3></div>
+          <div class="modal-body">
+	    <div class="input-group">
+	      <input type="text" id="cs-search" class="form-control" placeholder="Query"/>
+	      <button class="btn btn-primary" onclick="runCSSearch()">Search</button>
+	    </div>
+	    <div class="row mt-2">
+              <table id="csevent-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Event ID</th>
+		   <th>Name</th>
+		   <th>Dates</th>
+		   <th>OA</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="selectCSEvent()">Select</button>
          </div>
        </div>
      </div>
@@ -463,37 +500,7 @@ $(document).ready(function() {
 			fieldBoundary: '', fieldSeparator: '\t' },
 		{ extend: 'print', title: "Entries" }
 	] });
-
-	loadMWPHRFData();
 });
-
-function loadMWPHRFData() {
-        $.ajax({
-                url: "http://mwphrfexport.dnsalias.org/MWPHRF_Certificates.csv",
-                type: "GET",
-                success: function (data, status, http) {
-                        if ( http.status==200 ) {
-        			const csv = Papa.parse(data, { header: true });
-				csv.data.forEach( parseCert );
-                        }
-                },
-                error: function (http, status, error) {
-                        alert(status);
-                }
-        });
-}
-	
-function parseCert(cert) {
-	cert.sailno_int = cert.sailno.replace(/\D/g, ''); 
-	cert.yacht_name in mwphrf_data.by_name ? mwphrf_data.by_name[cert.yacht_name].push(cert) : mwphrf_data.by_name[cert.yacht_name] = [ cert ];
-	cert.sailno_int in mwphrf_data.by_sail ? mwphrf_data.by_sail[cert.sailno_int].push(cert) : mwphrf_data.by_sail[cert.sailno_int] = [ cert ];
-	cert.type_class in mwphrf_data.by_makemodel ? mwphrf_data.by_makemodel[cert.type_class].push(cert) : mwphrf_data.by_makemodel[cert.type_class] = [ cert ];
-	cert.DHCP = parseInt(cert.dhcp)
-	cert.BHCP = parseInt(cert.bhcp)
-	cert.HCP = parseInt(cert.hcp)
-	cert.NSHCP = parseInt(cert.nshcp)
-	mwphrf_data.all_data.push(cert);
-}
 
 function loadEntries(entries) {
 	// Clear the selection areas
@@ -533,7 +540,7 @@ function parseEntry(entry) {
 	} else {
 		sec_map[entry.racing_circle][entry.racing_division].add(entry.racing_class);
 	}
-	entry.mwphrf_matches = new Set();
+	entry.mwphrf_matches = new MapSet();
 	entry.mwphrf_selected = null;
 	entry.mwphrf_var = null;
 	all_divs.add(entry.racing_division);
@@ -583,8 +590,8 @@ function filter_change() {
 
 function displayMatches(data, type, row, meta) {
 	if ( type == "display" ) {
-		const badge_class = data.size == 1 ? "bg-info" : ( data.size > 1 ? "bg-warning" : "bg-danger" );
-		return `<span class="badge ${badge_class}">${data.size}</span>`;
+		const badge_class = data.size == 1 ? "btn-outline-info" : ( data.size > 1 ? "btn-outline-warning" : "btn-outline-danger" );
+		return `<button class="btn ${badge_class}" value="${meta.row}">${data.size}</button>`;
 	}
 	return data.size;
 }
@@ -622,8 +629,12 @@ function isValid(entry) {
 
 function runYSSearch() {
 	query = $('#ys-search').val();
-	$('#ysevent-table').DataTable().clear();
-	YSEvent.search(query, 1, (events) => { $('#ysevent-table').DataTable().rows.add(events).draw(); });
+	const ystable = $('#ysevent-table').DataTable()
+	ystable.clear();
+	YSEvent.search(query, 1, (events) => { 
+		ystable.rows.add(events);
+		ystable.columns.adjust().draw();
+	});
 }
 
 function selectYSEvent() {
@@ -636,8 +647,12 @@ function selectYSEvent() {
 
 function runCSSearch() {
 	query = $('#cs-search').val();
-	$('#csevent-table').DataTable().clear();
-	CSEvent.search(query, (events) => { $('#csevent-table').DataTable().rows.add(events).draw(); });
+	const cstable = $('#csevent-table').DataTable();
+	cstable.clear();
+	CSEvent.search(query, (events) => { 
+		cstable.rows.add(events); 
+		cstable.columns.adjust().draw();
+	});
 }
 
 function selectCSEvent() { 
@@ -666,37 +681,71 @@ function clearTables() {
 	$('#clearData').modal('hide');
 }
 
+var todo = 0;
+var complete = 0;
+
 // Function to find MWPHRF matches
 function findMWPHRFMatch() {
 	$('#mwphrf_find_btn').prop('disabled', true);
-	let match_types = [];
+	const match_types = [];
 	$('input[name="mwphrf-match"]:checked').each( function () { match_types.push($(this).val()); });
-	let match_method = $('#mwphrf-match-method').val();
-	let entry_len = $('#entry-table').DataTable().data().length;
-	$('#entry-table').DataTable().data().each( (entry, idx) => { makeMWPHRFMatch(entry, match_types, match_method); 
-		$('#mwphrf_progress').width = ((idx / entry_len) * 100 ) + "%";
-		$('#mwphrf_progress').html = idx + " of " + entry_len; } );
-	// All the enties are complete
-	$('#entry-table').DataTable().rows().invalidate().draw();
-	$('#mwphrf_find_btn').prop('disabled', false);
-	$('#mwphrf-match').modal('hide');
+	const match_method = $('#mwphrf-match-method').val();
+	const current_year = $('#mwphrf-year').val() === "current";
+	const entry_len = $('#entry-table').DataTable().data().length;
+	todo = entry_len * match_types.length;
+	complete = 0;
+	$('#entry-table').DataTable().data().each( (entry, idx) => { makeMWPHRFMatch(entry, match_types, match_method, current_year); 
+	} );
 }
 
-function makeMWPHRFMatch(entry, match_types, match_method) {
+function makeMWPHRFMatch(entry, match_types, match_method, current_year=false) {
 	if ( match_method == "skip" && entry.mwphrf_matches.size > 0 ) 
 		return;
-	let matches = match_types.map( (a_type) => { switch (a_type) { 
-		case "sailnumber": return mwphrf_data.by_sail[entry.sail_number.replace(/\D/g, '')];
-		case "boatname": return mwphrf_data.by_name[entry.name];
-		case "makemodel": return mwphrf_data.by_makemodel[entry.design];
-	} }).flat().filter( (item) => item != undefined );
 	if ( match_method == "overwrite" ) 
 		entry.mwphrf_matches.clear();
+
+	match_types.forEach( (a_type) => { 
+		switch (a_type) { 
+		case "sail": searchMWPHRF('', entry.sail_number.replace(/\D/g, ''), 
+			(matches) => { addMWPHRFMatch(entry, matches, current_year) }, true);
+			break;
+		case "name": searchMWPHRF(a_type, entry.name,
+			(matches) => { addMWPHRFMatch(entry, matches, current_year) });
+			break;
+		case "type": searchMWPHRF(a_type, entry.design,
+			(matches) => { addMWPHRFMatch(entry, matches, current_year) });
+			break;
+		} 
+	})
+}
+
+function addMWPHRFMatch(entry, matches, current_year=false) { 
+
 	if ( matches.length > 0 ) { 
-		entry.mwphrf_matches.add(...matches);
+		if ( current_year ) {
+			const this_year = new Date().getFullYear().toString();
+			matches.forEach( (item) => { if ( item.validFor.toString() === this_year ) entry.mwphrf_matches.add(item); });
+		} else {
+			entry.mwphrf_matches.add(...matches);
+		}
 		// If there is only one match, then set it as the selected one.
 		if ( entry.mwphrf_matches.size == 1 ) 
 			entry.mwphrf_selected = entry.mwphrf_matches.values().next().value;
+	}
+
+	complete++;
+
+	if ( complete == todo ) { 
+		// All the enties are complete
+		$('#entry-table').DataTable().rows().invalidate().draw();
+		$('#mwphrf_find_btn').prop('disabled', false);
+		$('#mwphrf-match').modal('hide');
+		$('#mwphrf_progress').width(0);
+		$('#mwphrf_progress').html("");
+	} else {
+		const percent = Math.round((complete / todo) * 100) + "%"
+		$('#mwphrf_progress').width(percent);
+		$('#mwphrf_progress').html(percent);
 	}
 }
 
@@ -707,21 +756,6 @@ function setMWPHRFVar() {
 	$('#entry-table').DataTable().rows().invalidate().draw();
 	$('#mwphrf-setvar').modal('hide');
 }
-// Function to get data from MWRPHF
-function getMWPHRFData() {
-	$('#mwphrf-load').modal('hide');
-	regions = $('#mwphrf-region').val();
-	console.log(regions);
-	// Clear the existing mwphrf_data array
-	mwphrf_data.length = 0;
-
-	/*
-	for ( let r=0; r < regions.length; r++ ) {
-		getMWPHRFRegion(regions[r], function(data) { mwphrf_data.push(data); });
-	}
-	*/
-}
-
 </script>
 
 </body>
