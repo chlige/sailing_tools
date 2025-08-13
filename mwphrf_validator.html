@@ -599,18 +599,18 @@ function displayMatches(data, type, row, meta) {
 function displayRating(data, type, row, meta) {
 	if ( type == "display" ) {
 		return data != undefined && row.mwphrf_var != undefined ?
-			data[ row.mwphrf_var ] + " (" + row.mwphrf_var + ")" :
+			data[ row.mwphrf_var.toLowerCase() ] + " (" + row.mwphrf_var + ")" :
 			"";
 	} else {
 		return data != undefined && row.mwphrf_var != undefined ?
-			data[ row.mwphrf_var ] :
+			data[ row.mwphrf_var.toLowerCase() ] :
 			null
 	}
 }
 
 function displayValid(data, type, row, meta) {
 	const cert_var = data != undefined && row.mwphrf_var != undefined ? 
-			data[ row.mwphrf_var ] : null;
+			data[ row.mwphrf_var.toLowerCase() ] : null;
 	const is_valid = row.ratings.PHRF != undefined && row.ratings.PHRF === cert_var;
 	if ( type == "display" ) {
 		const badge_class = is_valid ? "bg-success" : "bg-danger";
@@ -752,8 +752,9 @@ function addMWPHRFMatch(entry, matches, current_year=false) {
 // function to set MWPHRF variables
 function setMWPHRFVar() {
 	let sel_var = $('#mwphrf-var').val();
-	$('#entry-table').DataTable().data().each( (entry, idx) => { entry.mwphrf_var = sel_var; } );
-	$('#entry-table').DataTable().rows().invalidate().draw();
+	const entry_table = $('#entry-table').DataTable()
+	entry_table.data().each( (entry, idx) => { entry.mwphrf_var = sel_var; } );
+	entry_table.rows().invalidate().draw();
 	$('#mwphrf-setvar').modal('hide');
 }
 </script>
