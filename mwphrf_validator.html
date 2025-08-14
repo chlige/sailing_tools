@@ -277,37 +277,6 @@
      </div>
    </div>
 
-   <!-- Modal to set selected cert for a entry -->
-    <div class="modal fade" id="sel_cert" tabindex="-1" role="dialog" aria-labelledby="Select The ClubSpot Event(s)">
-      <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-          <div class="modal-header"><h3>Select The ClubSpot Event(s)</h3></div>
-          <div class="modal-body">
-	    <div class="input-group">
-	      <input type="text" id="cs-search" class="form-control" placeholder="Query"/>
-	      <button class="btn btn-primary" onclick="runCSSearch()">Search</button>
-	    </div>
-	    <div class="row mt-2">
-              <table id="csevent-table" class="table table-striped" style="width:100%">
-                <thead>
-	          <tr>
-		   <th>Event ID</th>
-		   <th>Name</th>
-		   <th>Dates</th>
-		   <th>OA</th>
-	         </tr>
-               </thead>
-             </table>
-           </div>
-         </div>
-         <div class="modal-footer">
-           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-           <button type='button' class='btn btn-primary' onclick="selectCSEvent()">Select</button>
-         </div>
-       </div>
-     </div>
-   </div>
-
     <div class="modal fade" id="filters" tabindex="-1" role="dialog" aria-labelledby="Filter Displayed Entries">
       <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -350,9 +319,46 @@
      </div>
    </div>
 
+    <!-- Modal to set MWPHRF cert for a entry -->
+    <div class="modal fade" id="select-cert" tabindex="-1" role="dialog" aria-labelledby="Select certificate">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select MWPHRF certificate</h3></div>
+          <div class="modal-body">
+	    <div class="row mt-2">
+	      <div class="card">
+	        <div class="card-body">
+                  <h5 class="card-title">Entry</h5>
+		  <p class="card-text" id="select-cert-entry"></p>
+		</div>
+	      </div>
+              <table id="cert-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Sail #</th>
+		   <th>Yacht name</th>
+		   <th>Make-model</th>
+		   <th>Issued on</th>
+		   <th>BHCP</th>
+		   <th>HCP</th>
+		   <th>DHCP</th>
+		   <th>NSHCP</th>
+		   <th>Link</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button id="mwphrf_set_btn" type='button' class='btn btn-primary' onclick="setMatch()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
   <!-- Main content -->
   <div class="container-fluid mt-2 px-5 py-3">
-
     <div class="mb-4 rounded-3">
       <div class="container-fluid py-5">
         <h1 class="display-5"><span class="fw-bold">MWPHRF Validator</span> <small class="fw-normal text-muted">v1.0</small></h1>
@@ -500,6 +506,28 @@ $(document).ready(function() {
 			fieldBoundary: '', fieldSeparator: '\t' },
 		{ extend: 'print', title: "Entries" }
 	] });
+
+	$('#cert-table').DataTable({
+		data: [],
+		order: [ [0, 'asc'] ],
+		select: 'single',
+    		columns: [
+	    		{ data: 'sailNo' },
+	    		{ data: 'yachtName' },
+	    		{ data: 'makeModel' },
+			{ data: 'issueDate', render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'bhcp' },
+			{ data: 'hcp' },
+			{ data: 'dhcp' },
+			{ data: 'nshcp' },
+			{ data: 'certificateUrl', render: displayURL }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No certificates available" }, 
+		searching: false,
+	});
 });
 
 function loadEntries(entries) {
@@ -590,8 +618,8 @@ function filter_change() {
 
 function displayMatches(data, type, row, meta) {
 	if ( type == "display" ) {
-		const badge_class = data.size == 1 ? "btn-outline-info" : ( data.size > 1 ? "btn-outline-warning" : "btn-outline-danger" );
-		return `<button class="btn ${badge_class}" value="${meta.row}">${data.size}</button>`;
+		const button_class = row.mwphrf_selected != undefined ? "btn-outline-primary" : ( data.size > 1 ? "btn-outline-warning" : "btn-outline-danger" );
+		return `<button class="btn ${button_class}" onclick='showSelectCert(${meta.row})'>${data.size}</button>`;
 	}
 	return data.size;
 }
@@ -626,6 +654,13 @@ function isValid(entry) {
 	return entry.ratings.PHRF != undefined && entry.ratings.PHRF === cert_var;
 }
 
+// Function to display the Certificate link in the table
+function displayURL(data, type, row, meta) {
+        if ( type == "display" ) {
+                return `<a class="btn btn-info" href="${data}" target="_blank">View</a>`;
+        }
+        return data;
+}
 
 function runYSSearch() {
 	query = $('#ys-search').val();
@@ -681,6 +716,37 @@ function clearTables() {
 	$('#clearData').modal('hide');
 }
 
+var curr_entry;
+var sel_row;
+
+function showSelectCert(row_idx) { 
+	curr_entry = $('#entry-table').DataTable().row(row_idx).data();
+	sel_row = row_idx;
+	$('#select-cert-entry').html(`${curr_entry.sail_number} - ${curr_entry.name} - ${curr_entry.design}`);
+	$('#select-cert').modal('show');
+	const cert_table = $('#cert-table').DataTable();
+	cert_table.clear();
+	var sel_cert = undefined;
+	var curr_row = 0;
+	curr_entry.mwphrf_matches.values().forEach( (item) => {
+		cert_table.row.add(item);
+		if ( item === curr_entry.mwphrf_selected ) sel_cert = curr_row;
+		curr_row++;
+	});
+	if ( sel_cert != undefined ) cert_table.row(sel_cert).select();
+	cert_table.draw();
+}
+
+function setMatch() {
+	const selrows = $('#cert-table').DataTable().rows({ selected: true }).data()
+	const sel_cert = selrows[0];
+	curr_entry.mwphrf_selected = sel_cert;
+	$('#entry-table').DataTable().row(sel_row).invalidate().draw();
+	curr_entry = undefined;
+	sel_row = undefined;
+	$('#select-cert').modal('hide');
+}
+
 var todo = 0;
 var complete = 0;
 
@@ -731,6 +797,8 @@ function addMWPHRFMatch(entry, matches, current_year=false) {
 		// If there is only one match, then set it as the selected one.
 		if ( entry.mwphrf_matches.size == 1 ) 
 			entry.mwphrf_selected = entry.mwphrf_matches.values().next().value;
+		else
+			entry.mwphrf_selected = null;
 	}
 
 	complete++;
@@ -761,3 +829,7 @@ function setMWPHRFVar() {
 
 </body>
 </html>
+
+
+
+
