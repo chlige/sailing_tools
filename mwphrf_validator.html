@@ -51,7 +51,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Results Export</a>
+      <a class="navbar-brand" href="#">MWPHRF Validator</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -71,8 +71,15 @@
 	      <li><a class="dropdown-item" href="#" onclick="$('#mwphrf-setvar').modal('show')">Set variable</a></li>
           </ul>
 	  <li class="nav-item">
-	    <a class="nav-link" href="#" onclick="$('#clearData').modal('show')">Clear data</a>
+	    <a class="nav-link" href="#" onclick="$('#clearData').modal('show')">Clear</a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" href="#" onclick="$('#help').modal('show')">Help</a>
+	  </li>
 	</ul>
+	<span class="d-flex">
+	  <a class="btn btn-outline-light" href="index.html">All tools</a>
+	</span>
       </div>
     </div>
   </nav>
@@ -357,35 +364,39 @@
      </div>
    </div>
 
-  <!-- Main content -->
-  <div class="container-fluid mt-2 px-5 py-3">
-    <div class="mb-4 rounded-3">
-      <div class="container-fluid py-5">
-        <h1 class="display-5"><span class="fw-bold">MWPHRF Validator</span> <small class="fw-normal text-muted">v1.0</small></h1>
-	<div class="col-md-8"><p class="fs-4">Validate MWPHRF ratings for entries from YachtScoring, The ClubSpot and RailMeets.</p>
-		<a href="index.html" class="btn btn-outline-primary">Back to all tools</a> 
-		<button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#help_info">More information</button>
-		<div id="help_info" class="collapse">
-			<div class="card card-body mt-2 bg-body-tertiary">
+    <!-- Modal to display help -->
+    <div class="modal fade" id="help" tabindex="-1" role="dialog" aria-labelledby="Help">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+		  <h5 class="modal-title">MWPHRF Validator v1.0</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	  </div>
+          <div class="modal-body">
+		<p>This tools is used to validate MWPHRF ratings for entries from YachtScoring, The ClubSpot and RailMeets.</p>
 			  <ul>
 			    <li>Use the <b>Load</b> menu to select the event from the different regatta websites.</li>
-                            <li>Use <b>Filters</b> to filter the displayed entry data.</li>
+                            <li>If needed, you can use the <i>Search Filters</i> to filter the displayed entry data.</li>
 			    <li>Use the <b>MPWHRF</b> menu to..
 				<ol><li><b>Find matches</b> of the filtered entries to current MWPHRF certificate data</li>
-				<li><b>Set variable</b>, i.e. HCP, DHCP or NSHCP, to compare from the matched cetificates.</li></ol>
+				<li><b>Set variable</b>, i.e. HCP, DHCP or NSHCP, to compare from the matched cetificates with requested ratings.</li></ol>
 			    </li>
 			    <li>Use the <b>Excel</b>, <b>TSV</b> or <b>Print</b> functions to export the filter data as an Excel file, plaintext (tab separated values) or print to PDF</li>
-			    <li>Use the <b>Clear data</b> menu item to clear all selected data and create a new report.</li>
+			    <li>Use the <b>Clear</b> menu item to clear all selected data and create a new report.</li>
 			  </ul>
-		       </div>
-		</div>
 
-      </div>
-    </div>
-
+         </div>
+       </div>
+     </div>
+   </div>
+  <!-- Main content -->
+  <div class="container-fluid mt-2 px-5 py-3">
         <div class="card">
+	    <div class="card-header">
+		    <h5>Event</h5>
+	    </div>
 	    <div class="card-body">
-		    <h5 class="card-title" id="event_title"></h5>
+		    <h5 class="card-title" id="event_title">None</h5>
 		    <p class="card-text" id="event_details"></p>
 	    </div>
     </div>
@@ -733,6 +744,8 @@ function selectRMEvent() {
 function clearTables() { 
 	$('#entry-table').DataTable().clear().draw();
 	$('#clearData').modal('hide');
+	$('#event_title').html('None');
+	$('#event_details').html('');
 }
 
 var curr_entry;
