@@ -478,7 +478,7 @@ $(document).ready(function() {
 
 	$('#entry-table').DataTable({
 	     data: [],
-	     order: [ [0, 'asc'] ],
+	     order: [ [0, 'asc'], [1, 'asc'], [2, 'asc'], [4, 'asc'] ],
     	     columns: [
 		{ data: 'racing_circle' },
 		{ data: 'racing_division' },
@@ -492,15 +492,33 @@ $(document).ready(function() {
 		{ data: 'mwphrf_selected', render: displayRating },
 		{ data: 'mwphrf_selected', render: displayValid }
 	     ],
+	     columnDefs: [
+		     { searchPanes: { show:true, collapse: true, initCollapsed: true, }, targets: [0,1,2] },
+		     { searchPanes: { initCollapsed: true, show: true, header: "Matches", orderable: false,
+			     options: [ 
+				     { label: "1", value: function(rowData, rowIdx) { return rowData.mwphrf_matches.size == 1; } },
+				     { label: "0", value: function(rowData, rowIdx) { return rowData.mwphrf_matches.size == 0; } },
+				     { label: "> 1", value: function(rowData, rowIdx) { return rowData.mwphrf_matches.size > 1; } }
+			     ]
+		     }, targets: [8] },
+		     { searchPanes: { show: true, initCollapsed: true, header: "Valid rating", orderable: false,
+			     options: [
+				     { label: "Yes", value: function(rowData, rowIdx) { return isValid(rowData); } },
+				     { label: "No", value: function(rowData, rowIdx) { return ! isValid(rowData); } } ]
+		     }, targets: [ 10 ] }, 
+		     { searchPanes: { show: false }, targets: [3, 4, 5, 6, 7, 9 ] }
+	     ],
     	     rowId: 'id',
     	     pageLength: 50,
     	     language: {
         	emptyTable: "No entries loaded"
       	     },
-             dom: "Bfrtip",
+	     layout: { 
+	     	top2: 'searchPanes',
+	     	top1Start: 'buttons',
+	     },
 	     buttons: [ 
 	     	{ extend: 'colvis', text: 'Table columns' },
-                { text: 'Filter', action: function (e, dt, node, config) { bootstrap.Modal.getOrCreateInstance(document.querySelector('#filters')).show() } },
 		{ extend: 'excel', filename: "MWPHRF Validator - Entries", title: "Entries" },
 		{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "MWPHRF Validator - Entries", 
 			fieldBoundary: '', fieldSeparator: '\t' },
@@ -544,6 +562,7 @@ function loadEntries(entries) {
 	Array.from(Object.keys(sec_map)).toSorted().forEach( (val) => { make_filter('sel_cirs', 'filter_circle', val) });
 	Array.from(all_divs).toSorted().forEach( (val) => { make_filter('sel_divs', 'filter_div', val) });
 	Array.from(all_classes).toSorted().forEach( (val) => { make_filter('sel_secs', 'filter_section', val) });
+	$('#entry-table').DataTable().searchPanes.rebuildPane();
 	$('#entry-table').DataTable().draw();
 }
 
@@ -754,14 +773,14 @@ var complete = 0;
 function findMWPHRFMatch() {
 	$('#mwphrf_find_btn').prop('disabled', true);
 	const match_types = [];
+	const entries = $('#entry-table').DataTable().rows({search: 'applied'}).data();
 	$('input[name="mwphrf-match"]:checked').each( function () { match_types.push($(this).val()); });
 	const match_method = $('#mwphrf-match-method').val();
 	const current_year = $('#mwphrf-year').val() === "current";
-	const entry_len = $('#entry-table').DataTable().data().length;
+	const entry_len = entries.length;
 	todo = entry_len * match_types.length;
 	complete = 0;
-	$('#entry-table').DataTable().data().each( (entry, idx) => { makeMWPHRFMatch(entry, match_types, match_method, current_year); 
-	} );
+	entries.each( (entry, idx) => { makeMWPHRFMatch(entry, match_types, match_method, current_year); } );
 }
 
 function makeMWPHRFMatch(entry, match_types, match_method, current_year=false) {
@@ -805,7 +824,8 @@ function addMWPHRFMatch(entry, matches, current_year=false) {
 
 	if ( complete == todo ) { 
 		// All the enties are complete
-		$('#entry-table').DataTable().rows().invalidate().draw();
+		$('#entry-table').DataTable().rows({search: 'applied'}).invalidate().draw();
+		$('#entry-table').DataTable().searchPanes.rebuildPane();
 		$('#mwphrf_find_btn').prop('disabled', false);
 		$('#mwphrf-match').modal('hide');
 		$('#mwphrf_progress').width(0);
@@ -820,9 +840,10 @@ function addMWPHRFMatch(entry, matches, current_year=false) {
 // function to set MWPHRF variables
 function setMWPHRFVar() {
 	let sel_var = $('#mwphrf-var').val();
-	const entry_table = $('#entry-table').DataTable()
-	entry_table.data().each( (entry, idx) => { entry.mwphrf_var = sel_var; } );
-	entry_table.rows().invalidate().draw();
+	const entry_table = $('#entry-table').DataTable();
+	entry_table.rows({search: 'applied'}).data().each( (entry, idx) => { entry.mwphrf_var = sel_var; } );
+	entry_table.rows({search: 'applied'}).invalidate().draw();
+	entry_table.searchPanes.rebuildPane();
 	$('#mwphrf-setvar').modal('hide');
 }
 </script>
