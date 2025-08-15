@@ -20,19 +20,16 @@
 
 <!-- DataTables -->
 <!-- Included libraries:
- To rebuild or modify this file with the latest versions of the included
- software please visit:
-   https://datatables.net/download/#bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0
-
- Included libraries:
-    JSZip 2.5.0, DataTables 1.12.1, Buttons 2.2.3, Column visibility 2.2.3, HTML5 export 2.2.3,
- 	Print view 2.2.3, ColReorder 1.5.6, DateTime 1.1.2, FixedColumns 4.1.0, FixedHeader 3.2.4,
- 	KeyTable 2.7.0, Responsive 2.3.0, RowGroup 1.2.0, Scroller 2.0.7, Select 1.4.0
+ * To rebuild or modify this file with the latest versions of the included
+ * software please visit:
+ *   https://datatables.net/download/#bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1
+ *
+ * Included libraries:
+ *  JSZip 3.10.1, DataTables 2.3.2, Buttons 3.2.4, Column visibility 3.2.4, HTML5 export 3.2.4, Print view 3.2.4, ColReorder 2.1.1, DateTime 1.5.6, FixedColumns 5.0.4, FixedHeader 4.0.3, KeyTable 2.12.1, Responsive 3.0.5, RowGroup 1.5.2, Scroller 2.4.3, SearchBuilder 1.8.3, SearchPanes 2.3.4, Select 3.0.1
 -->
-<link rel="stylesheet" type="text/css"
-	href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0/datatables.min.css"/>
-<script type="text/javascript"
-	src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-colvis-2.2.3/b-html5-2.2.3/b-print-2.2.3/cr-1.5.6/date-1.1.2/fc-4.1.0/fh-3.2.4/kt-2.7.0/r-2.3.0/rg-1.2.0/sc-2.0.7/sl-1.4.0/datatables.min.js"></script>
+<link href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.css" rel="stylesheet" integrity="sha384-AJLr9lKaaCuSjzByAYUCZ33XS5Nl5K+kqmz154VoRrooT7qAG8f71ZhRpdXC+Cw/" crossorigin="anonymous">
+
+<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.js" integrity="sha384-01l+g4SkAg57RpPg0lgbZedebEdRAl+YD5+n67Mv/77+6vwyYSMEcrd1glx6eMPa" crossorigin="anonymous"></script>
 
 <script src="js/moment.min.js"></script>
 <!--
@@ -49,7 +46,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Results Export</a>
+      <a class="navbar-brand" href="#">Results Exporter</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -62,12 +59,17 @@
             </ul>
 	  </li>
 	  <li class="nav-item">
-	    <a class="nav-link" href="#" onclick="$('#clearData').modal('show')">Clear data</a>
-	</ul>
+		  <a class="nav-link" href="#" onclick="$('#clearData').modal('show')">Clear data</a>
+	  </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="$('#help').modal('show')">Help</a>
+          </li>                                                                                                                                                                                                          </ul>
+        <span class="d-flex">
+          <a class="btn btn-outline-light" href="index.html">All tools</a>
+        </span>
       </div>
     </div>
   </nav>
-
 
     <!-- Modal to clear data-->
     <div class="modal fade" id="clearData" tabindex="-1" role="dialog" aria-labelledby="Clear data">
@@ -83,6 +85,28 @@
        </div>
      </div>
    </div>
+
+
+       <!-- Modal to display help -->
+    <div class="modal fade" id="help" tabindex="-1" role="dialog" aria-labelledby="Help">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+                  <h5 class="modal-title">Regatta Exporter v1.1</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+		  <p>Export data for regattas from YachtScoring, The ClubSpot and RailMeets.</p>
+		<ul>
+			<li>Use the <b>Load</b> menu to select events from the different regatta websites.<br>You can select more than one event from more than one platform to create a full report of various regattas.</li>
+			<li>You can then inspect the report of <i>Events</i>, <i>Entries</i> and <i>Results</i> for the selected events.<br>Data in each of the tables can be saved as a Microsoft Excel file, plain text (TSV file) or can be printed</li>
+			<li>Use the <b>Clear data</b> menu item to clear all selected data and create a new report.</li>
+		</ul>
+	  </div>
+	</div>
+      </div>
+    </div>
+   
     <!-- Modal to select an event from YachtScoring -->
     <div class="modal fade" id="ysevents" tabindex="-1" role="dialog" aria-labelledby="Select YachtScoring Event(s)">
       <div class="modal-dialog modal-xl" role="document">
@@ -174,23 +198,6 @@
   <!-- Main content -->
   <div class="container-fluid mt-2 px-5 py-3">
 
-    <div class="mb-4 rounded-3">
-      <div class="container-fluid py-5">
-        <h1 class="display-5"><span class="fw-bold">Regatta Exporter</span> <small class="fw-normal text-muted">v1.0</small></h1>
-	<div class="col-md-8"><p class="fs-4">Export data for regattas from YachtScoring, The ClubSpot and RailMeets.</p>
-		<a href="index.html" class="btn btn-outline-primary">Back to all tools</a> 
-		<button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#help_info">More information</button>
-		<div id="help_info" class="collapse">
-			<div class="card card-body mt-2 bg-body-tertiary">
-		<ul><li>Use the <b>Load</b> menu to select events from the different regatta websites.<br>You can select more than one event from more than one platform to create a full report of various regattas.</li>
-			<li>You can then inspect the report of <i>Events</i>, <i>Entries</i> and <i>Results</i> for the selected events.<br>Data in each of the tables can be saved as a Microsoft Excel file, plain text (TSV file) or can be printed</li>
-				<li>Use the <b>Clear data</b> menu item to clear all selected data and create a new report.</li></ul>
-		</div>
-		</div>
-
-      </div>
-    </div>
-
    <div class="row mt-3">
      <div class="col">
       <ul class="nav nav-tabs" id="table_tabs" role="tablist">
@@ -281,7 +288,7 @@
 $(document).ready(function() {
 	$('#ysevent-table').DataTable({
 		data: [],
-		order: [ [0, 'asc'] ],
+		order: [ [2, 'desc'] ],
 		select: { style: 'multi' },
     		columns: [
 			{ data: 'id' },
@@ -298,7 +305,7 @@ $(document).ready(function() {
 
 	$('#csevent-table').DataTable({
 		data: [],
-		order: [ [0, 'asc'] ],
+		order: [ [2, 'desc'] ],
 		select: { style: 'multi' },
     		columns: [
 			{ data: 'id' },
@@ -315,7 +322,7 @@ $(document).ready(function() {
 
 	$('#rmevent-table').DataTable({
 		data: [],
-		order: [ [0, 'asc'] ],
+		order: [ [2, 'desc'] ],
 		select: { style: 'multi' },
     		columns: [
 			{ data: 'id', width:"10%" },
@@ -330,7 +337,6 @@ $(document).ready(function() {
     		language: { emptyTable: "No events available" }, 
 		searching: true,
 	});
-
 
 	$('#event-table').DataTable({
 	     data: [],
@@ -435,8 +441,12 @@ function displayDuration(data, type, row, meta) {
 
 function runYSSearch() {
 	query = $('#ys-search').val();
-	$('#ysevent-table').DataTable().clear();
-	YSEvent.search(query, 1, (events) => { $('#ysevent-table').DataTable().rows.add(events).draw(); });
+	const ystable = $('#ysevent-table').DataTable()
+        ystable.clear();
+        YSEvent.search(query, 1, (events) => {
+                ystable.rows.add(events);
+                ystable.columns.adjust().draw();
+        });
 }
 
 function selectYSEvents() { 
@@ -452,8 +462,12 @@ function selectYSEvents() {
 
 function runCSSearch() {
 	query = $('#cs-search').val();
-	$('#csevent-table').DataTable().clear();
-	CSEvent.search(query, (events) => { $('#csevent-table').DataTable().rows.add(events).draw(); });
+	const cstable = $('#csevent-table').DataTable();
+	cstable.clear();
+	CSEvent.search(query, (events) => { 
+		cstable.rows.add(events);
+		cstable.columns.adjust().draw(); 
+	});
 }
 
 function selectCSEvents() { 
