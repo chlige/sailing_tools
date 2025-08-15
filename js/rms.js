@@ -431,8 +431,8 @@ class RMEvent extends Regatta {
 			dataType: "json",
 			success: function (data, status, http) { 
 				if ( http.status==200 ) { 
-					let events = data.regattas.map( (ev_data) => { return new RMEvent(ev_data); });
-					table.rows.add(events);
+					table.clear();
+					table.rows.add( data.regattas.map( (ev_data) => { return new RMEvent(ev_data); }));
 					table.columns.adjust().draw();
 				}
 			},
