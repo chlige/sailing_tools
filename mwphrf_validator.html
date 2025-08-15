@@ -111,7 +111,7 @@
 	      <button class="btn btn-primary" onclick="runYSSearch()">Search</button>
 	    </div>
 	    <div class="row mt-2">
-              <table id="ysevent-table" class="table table-striped" style="width:100%">
+              <table id="ysevent-table" class="table table-striped rms-table" style="width:100%">
                 <thead>
 	          <tr>
 		   <th>Event ID</th>
@@ -142,7 +142,7 @@
 	      <button class="btn btn-primary" onclick="runCSSearch()">Search</button>
 	    </div>
 	    <div class="row mt-2">
-              <table id="csevent-table" class="table table-striped" style="width:100%">
+              <table id="csevent-table" class="table table-striped rms-table" style="width:100%">
                 <thead>
 	          <tr>
 		   <th>Event ID</th>
@@ -169,7 +169,7 @@
           <div class="modal-header"><h3>Select RailMeets Event(s)</h3></div>
           <div class="modal-body">
 	    <div class="row mt-2">
-              <table id="rmevent-table" class="table table-striped" style="width:100%">
+              <table id="rmevent-table" class="table table-striped rms-table" style="width:100%">
                 <thead>
 	          <tr>
 		   <th>Event ID</th>
@@ -376,7 +376,7 @@
 		<p>This tools is used to validate MWPHRF ratings for entries from YachtScoring, The ClubSpot and RailMeets.</p>
 			  <ul>
 			    <li>Use the <b>Load</b> menu to select the event from the different regatta websites.</li>
-                            <li>If needed, you can use the <i>Search Filters</i> to filter the displayed entry data.</li>
+                            <li>If needed, you can use the <b>Filters</b> to set filters for the displayed entry data.  You can select multiple options in a single filter with Ctrl-click.</li>
 			    <li>Use the <b>MPWHRF</b> menu to..
 				<ol><li><b>Find matches</b> of the filtered entries to current MWPHRF certificate data</li>
 				<li><b>Set variable</b>, i.e. HCP, DHCP or NSHCP, to compare from the matched cetificates with requested ratings.</li></ol>
@@ -393,10 +393,9 @@
   <div class="container-fluid mt-2 px-5 py-3">
         <div class="card">
 	    <div class="card-header">
-		    <h5>Event</h5>
+		    <h5>Event: <small class="text-muted" id="event_title">None</small></h5>
 	    </div>
 	    <div class="card-body">
-		    <h5 class="card-title" id="event_title">None</h5>
 		    <p class="card-text" id="event_details"></p>
 	    </div>
     </div>
@@ -435,9 +434,11 @@ var all_classes = new Set();
 var all_divs = new Set();
 
 $(document).ready(function() {
+
+
 	$('#ysevent-table').DataTable({
 		data: [],
-		order: [ [0, 'asc'] ],
+		order: [ [2, 'desc'] ],
 		select: 'single',
     		columns: [
 			{ data: 'id' },
@@ -454,7 +455,7 @@ $(document).ready(function() {
 
 	$('#csevent-table').DataTable({
 		data: [],
-		order: [ [0, 'asc'] ],
+		order: [ [2, 'desc'] ],
 		select: 'single',
     		columns: [
 			{ data: 'id' },
@@ -471,13 +472,12 @@ $(document).ready(function() {
 
 	$('#rmevent-table').DataTable({
 		data: [],
-		order: [ [0, 'asc'] ],
+		order: [ [2, 'desc'] ],
 		select: 'single',
     		columns: [
 			{ data: 'id', width:"10%" },
 	    		{ data: 'name' },
-			{ data: 'start_date', width: "15%",
-				render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'start_date', width: "15%", render: DataTable.render.datetime('MMM D, YYYY') },
 			{ data: 'oa', width: "10%" }
 		],
     		rowId: 'id',
@@ -501,7 +501,7 @@ $(document).ready(function() {
 		{ data: 'ratings.PHRF', defaultContent: '' },
 		{ data: 'mwphrf_matches', render: displayMatches },
 		{ data: 'mwphrf_selected', render: displayRating },
-		{ data: 'mwphrf_selected', render: displayValid }
+		{ data: 'is_valid', render: displayValid }
 	     ],
 	     columnDefs: [
 		     { searchPanes: { show:true, collapse: true, initCollapsed: true, }, targets: [0,1,2] },
@@ -514,8 +514,8 @@ $(document).ready(function() {
 		     }, targets: [8] },
 		     { searchPanes: { show: true, initCollapsed: true, header: "Valid rating", orderable: false,
 			     options: [
-				     { label: "Yes", value: function(rowData, rowIdx) { return isValid(rowData); } },
-				     { label: "No", value: function(rowData, rowIdx) { return ! isValid(rowData); } } ]
+				     { label: "Yes", value: function(rowData, rowIdx) { return rowData.is_valid; } },
+				     { label: "No", value: function(rowData, rowIdx) { return ! rowData.is_valid; } } ]
 		     }, targets: [ 10 ] }, 
 		     { searchPanes: { show: false }, targets: [3, 4, 5, 6, 7, 9 ] }
 	     ],
@@ -525,16 +525,17 @@ $(document).ready(function() {
         	emptyTable: "No entries loaded"
       	     },
 	     layout: { 
-	     	top2: 'searchPanes',
-	     	top1Start: 'buttons',
-	     },
-	     buttons: [ 
+	     	// top2: 'searchPanes',
+		topStart:  {
+	     		buttons: [ 
 	     	{ extend: 'colvis', text: 'Table columns' },
+		{ extend: 'searchPanes', text: 'Filters' },
 		{ extend: 'excel', filename: "MWPHRF Validator - Entries", title: "Entries" },
 		{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "MWPHRF Validator - Entries", 
 			fieldBoundary: '', fieldSeparator: '\t' },
-		{ extend: 'print', title: "Entries" }
-	] });
+				{ extend: 'print', title: "Entries" } ] } },
+	     language: { searchPanes: { collapse: "Filters", loadMessage: "" }}
+	});
 
 	$('#cert-table').DataTable({
 		data: [],
@@ -601,6 +602,7 @@ function parseEntry(entry) {
 	entry.mwphrf_matches = new MapSet();
 	entry.mwphrf_selected = null;
 	entry.mwphrf_var = null;
+	entry.is_valid = false;
 	all_divs.add(entry.racing_division);
 	all_classes.add(entry.racing_class);
 	$('#entry-table').DataTable().row.add(entry);
@@ -667,20 +669,17 @@ function displayRating(data, type, row, meta) {
 }
 
 function displayValid(data, type, row, meta) {
-	const cert_var = data != undefined && row.mwphrf_var != undefined ? 
-			data[ row.mwphrf_var.toLowerCase() ] : null;
-	const is_valid = row.ratings.PHRF != undefined && row.ratings.PHRF === cert_var;
 	if ( type == "display" ) {
-		const badge_class = is_valid ? "bg-success" : "bg-danger";
-		return `<span class="badge rounded-pill ${badge_class}">${is_valid}</span>`;
+		const badge_class = data ? "bg-success" : "bg-danger";
+		return `<span class="badge rounded-pill ${badge_class}">${data}</span>`;
 	} else {
-		return is_valid;
+		return data;
 	}
 }
 
 function isValid(entry) { 
 	const cert_var = entry.mwphrf_selected != undefined && entry.mwphrf_var != undefined ? 
-			entry.mwphrf_selected[ entry.mwphrf_var ] : null;
+			entry.mwphrf_selected[ entry.mwphrf_var.toLowerCase() ] : null;
 	return entry.ratings.PHRF != undefined && entry.ratings.PHRF === cert_var;
 }
 
@@ -773,6 +772,7 @@ function setMatch() {
 	const selrows = $('#cert-table').DataTable().rows({ selected: true }).data()
 	const sel_cert = selrows[0];
 	curr_entry.mwphrf_selected = sel_cert;
+	curr_entry.is_valid = isValid(curr_entry);
 	$('#entry-table').DataTable().row(sel_row).invalidate().draw();
 	curr_entry = undefined;
 	sel_row = undefined;
@@ -827,10 +827,13 @@ function addMWPHRFMatch(entry, matches, current_year=false) {
 			entry.mwphrf_matches.add(...matches);
 		}
 		// If there is only one match, then set it as the selected one.
-		if ( entry.mwphrf_matches.size == 1 ) 
+		if ( entry.mwphrf_matches.size == 1 ) {
 			entry.mwphrf_selected = entry.mwphrf_matches.values().next().value;
-		else
+			entry.is_valid = isValid(entry);
+		} else {
 			entry.mwphrf_selected = null;
+			entry.is_valid = false;
+		}
 	}
 
 	complete++;
@@ -854,9 +857,9 @@ function addMWPHRFMatch(entry, matches, current_year=false) {
 function setMWPHRFVar() {
 	let sel_var = $('#mwphrf-var').val();
 	const entry_table = $('#entry-table').DataTable();
-	entry_table.rows({search: 'applied'}).data().each( (entry, idx) => { entry.mwphrf_var = sel_var; } );
+	entry_table.rows({search: 'applied'}).data().each( (entry, idx) => { entry.mwphrf_var = sel_var; entry.is_valid = isValid(entry); } );
 	entry_table.rows({search: 'applied'}).invalidate().draw();
-	entry_table.searchPanes.rebuildPane();
+	entry_table.searchPanes.rebuildPane(5, true);
 	$('#mwphrf-setvar').modal('hide');
 }
 </script>
