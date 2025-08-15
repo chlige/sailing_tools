@@ -62,6 +62,12 @@ function searchMWPHRF(queryType, queryValue, callback, exactMatch=false) {
 
 // Version using the Railmeets bridge
 function searchMWPHRF(queryType, queryValue, callback, exactMatch=false) { 
+
+	if ( queryValue === "" || queryValue == undefined ) { 
+		callback([]);
+		return; 
+	}
+
 	const query_params = { 'q': queryValue };
 
 	if ( queryType != "" ) { query_params['by'] = queryType; }
