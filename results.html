@@ -403,9 +403,9 @@ var this_event;
 
 function groupResults( rowData, level ) {
 	const group = [];
-	if ( rowData.entry.racing_circle !== "" ) 
+	if ( results_table.column(0).visible() && rowData.entry.racing_circle !== "" ) 
 		group.push(rowData.entry.racing_circle);
-	if ( rowData.entry.racing_division !== "" ) 
+	if ( results_table.column(1).visible() && rowData.entry.racing_division !== "" ) 
 		group.push(rowData.entry.racing_division);
 	group.push( rowData.entry.racing_class, rowData.race.race_number);
 	return JSON.stringify(group);
@@ -424,7 +424,7 @@ function groupLabel(rows, group, level) {
 
 function loadEvent(ev) {
 	this_event = ev;
-	results_table.clear().draw();
+	results_table.search("").clear().draw();
 	$('#event_title').html(ev.name);
 	const date_diff = ( ev.end_date - ev.start_date ) / ( 1000 * 3600 * 24);
 	const options = { weekday: "long", year: "numeric", month: "long", day: "numeric", };
