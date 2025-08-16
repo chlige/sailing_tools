@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>Results Display</title>
+<!-- jQuery -->
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 5 -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous" />
+<script
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+	crossorigin="anonymous"></script>
+	
+<!--  Fontawesome 7 -->
+<script 
+	src="https://kit.fontawesome.com/be95d6b295.js" 
+	crossorigin="anonymous"></script>
+	
+<!-- DataTables -->
+<!-- Included libraries:
+ * To rebuild or modify this file with the latest versions of the included
+ * software please visit:
+ *   https://datatables.net/download/#bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1
+ *
+ * Included libraries:
+ *  JSZip 3.10.1, DataTables 2.3.2, Buttons 3.2.4, Column visibility 3.2.4, HTML5 export 3.2.4, Print view 3.2.4, ColReorder 2.1.1, DateTime 1.5.6, FixedColumns 5.0.4, FixedHeader 4.0.3, KeyTable 2.12.1, Responsive 3.0.5, RowGroup 1.5.2, Scroller 2.4.3, SearchBuilder 1.8.3, SearchPanes 2.3.4, Select 3.0.1
+-->
+<link href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.css" rel="stylesheet" integrity="sha384-AJLr9lKaaCuSjzByAYUCZ33XS5Nl5K+kqmz154VoRrooT7qAG8f71ZhRpdXC+Cw/" crossorigin="anonymous">
+ 
+<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.3.2/b-3.2.4/b-colvis-3.2.4/b-html5-3.2.4/b-print-3.2.4/cr-2.1.1/date-1.5.6/fc-5.0.4/fh-4.0.3/kt-2.12.1/r-3.0.5/rg-1.5.2/sc-2.4.3/sb-1.8.3/sp-2.3.4/sl-3.0.1/datatables.min.js" integrity="sha384-01l+g4SkAg57RpPg0lgbZedebEdRAl+YD5+n67Mv/77+6vwyYSMEcrd1glx6eMPa" crossorigin="anonymous"></script>
+
+<script src="js/moment.min.js"></script>
+<script type="text/javascript" src="js/rms.js"></script>
+
+</head>
+
+<body class="d-flex flex-column vh-100">
+
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a id="brand_text" class="navbar-brand" href="#"><i class="fa-solid fa-table-list"></i> Results Display</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+	  <li class="nav-item dropdown">
+	    <a class="nav-link dropdown-toggle" href="#" id="navbarLoad" role="button" data-bs-toggle="dropdown" aria-expanded="false">Load</a>
+            <ul class="dropdown-menu" aria-labelledby="navbarLoad">
+	      <li><a class="dropdown-item" href="#" onclick="$('#ysevents').modal('show')">YachtScoring</a></li>
+	      <li><a class="dropdown-item" href="#" onclick="$('#csevents').modal('show')">The ClubSpot</a></li>
+	      <li><a class="dropdown-item" href="#" onclick="displayRMDialog()">RailMeets</a></li>
+            </ul>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" id="start_button" href="#" onclick="$('#startScroll').modal('show')">Start <i class="fa-solid fa-play"></i></a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link disabled" id="stop_button" href="#" onclick="$('#stopScroll').modal('show')">Stop <i class="fa-solid fa-stop"></i></a>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" href="#" onclick="$('#clearData').modal('show')">Clear data</a>
+	  </li>
+	<li class="nav-item">
+	    <a class="nav-link" href="#" onclick="$('#help').modal('show')">Help</a>
+	  </li>
+	</ul>
+	<span class="d-flex">
+	  <a class="btn btn-outline-light" href="index.html">All tools</a>
+	</span>
+      </div>
+    </div>
+  </nav>
+  
+    <!-- Modal to display help -->
+    <div class="modal fade" id="help" tabindex="-1" role="dialog" aria-labelledby="Help">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+		  <h5 class="modal-title">Results Display v1.0</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	  </div>
+          <div class="modal-body">
+		<p>This tools will display results from YachtScoring, The ClubSpot or RailMeets.</p>
+			  <ul>
+			    <li>Use the <b>Load</b> menu to select the event from the different regatta websites.</li>
+				<li>Click <b>Start</b> to start the scrolling display of the results
+				  <ul>
+				    <li>Set the <i>Interval</i> as the number of seconds between moving up each row</li>
+				    <li>Optionally set the <i>Reload data</i> interval as the number of minutes between reloading the entire table.</li>
+				    <li>Optionally deselect columns to hide from view</li>
+				    <li>Optionally select the races to include in the display.  You can use Ctrl-click to select multiple races</li>
+				    </ul>
+				    </li>     
+				<li>Use the <b>Stop</b> menu item to stop the scrolling</li>
+			    <li>Use the <b>Clear</b> menu item to clear all selected data and select a new event.</li>
+			  </ul>
+
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to start scrolling -->
+    <div class="modal fade" id="startScroll" tabindex="-1" role="dialog" aria-labelledby="Start Scroll">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+		    <h4>Start Scrolling</h4>
+		    <label class="form-label">Interval (seconds)</label>
+		    <input id="scroll_int" class="form-control" value="2" type="number", min="1", max="10">
+		    <label class="form-label">Reload data (minutes), if blank or "0" will not reload data</label>
+		    <input id="reload_int" class="form-control" type="number">
+		    <p>Columns to display</p>
+		    <div class="form-check form-check-inline">
+		    	<input class="form-check-input" type="checkbox" name="display_col" value="0" checked>
+		    	<label class="form-check-label">Circle</label>
+		    </div>
+		    <div class="form-check form-check-inline">
+		    	<input class="form-check-input" type="checkbox" name="display_col" value="1" checked>
+		    	<label class="form-check-label">Division</label>
+		    </div>
+		    <div class="form-check form-check-inline">
+		    	<input class="form-check-input" type="checkbox" name="display_col" value="3" checked>
+		    	<label class="form-check-label">Race Number</label>
+		    </div>
+		    <div class="form-check form-check-inline">
+		    	<input class="form-check-input" type="checkbox" name="display_col" value="7" checked>
+		    	<label class="form-check-label">Elapsed time</label>
+		    </div>
+		    <div class="form-check form-check-inline">
+		    	<input class="form-check-input" type="checkbox" name="display_col" value="8" checked>
+		    	<label class="form-check-label">Corrected time</label>
+		    </div>
+            <p>Races to include (Ctrl-click to select more than one)</p>
+            <select id="races" class="form-select" multiple></select>
+          </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-success' onclick="startScroll()">Start</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to stop scrolling-->
+    <div class="modal fade" id="stopScroll" tabindex="-1" role="dialog" aria-labelledby="Stop scroll">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+		  <h4>Stop scrolling the results</h4>
+          </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-danger' onclick="stopScroll()">Stop</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to clear data-->
+    <div class="modal fade" id="clearData" tabindex="-1" role="dialog" aria-labelledby="Clear data">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+		  <h4>Clear existing table data?</h4>
+          </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-danger' onclick="clearTables()">Confirm</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to select an event from YachtScoring -->
+    <div class="modal fade" id="ysevents" tabindex="-1" role="dialog" aria-labelledby="Select YachtScoring Event(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select YachtScoring Event(s)</h3></div>
+          <div class="modal-body">
+	    <div class="input-group">
+	      <input type="text" id="ys-search" class="form-control" placeholder="Query"/>
+	      <button class="btn btn-primary" onclick="runYSSearch()">Search</button>
+	    </div>
+	    <div class="row mt-2">
+              <table id="ysevent-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Event ID</th>
+		   <th>Name</th>
+		   <th>Dates</th>
+		   <th>OA</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="selectYSEvent()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to select an event from Clubspot -->
+    <div class="modal fade" id="csevents" tabindex="-1" role="dialog" aria-labelledby="Select The ClubSpot Event(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select The ClubSpot Event(s)</h3></div>
+          <div class="modal-body">
+	    <div class="input-group">
+	      <input type="text" id="cs-search" class="form-control" placeholder="Query"/>
+	      <button class="btn btn-primary" onclick="runCSSearch()">Search</button>
+	    </div>
+	    <div class="row mt-2">
+              <table id="csevent-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Event ID</th>
+		   <th>Name</th>
+		   <th>Dates</th>
+		   <th>OA</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="selectCSEvent()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+    <!-- Modal to select an event from Railmeets -->
+    <div class="modal fade" id="rmevents" tabindex="-1" role="dialog" aria-labelledby="Select RailMeets Event(s)">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header"><h3>Select RailMeets Event(s)</h3></div>
+          <div class="modal-body">
+	    <div class="row mt-2">
+              <table id="rmevent-table" class="table table-striped" style="width:100%">
+                <thead>
+	          <tr>
+		   <th>Event ID</th>
+		   <th>Name</th>
+		   <th>Dates</th>
+		   <th>OA</th>
+	         </tr>
+               </thead>
+             </table>
+           </div>
+         </div>
+         <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+           <button type='button' class='btn btn-primary' onclick="selectRMEvent()">Select</button>
+         </div>
+       </div>
+     </div>
+   </div>
+
+  <!-- Main content -->
+  <div class="container-fluid mt-2 px-5 py-3 h-100">
+	<div class="card">
+	    <div class="card-header">
+		    <h3 id="event_title"></h3>
+	    </div>
+	    <div class="card-body">
+		    <p class="card-text" id="event_details"></p>
+	    </div>
+    </div>
+
+   <div class="row mt-3">
+     <div class="col">
+	  <div class="mt-3">
+		<table id="results-table" class="table table-striped" style="width:100%">
+                  <thead>
+                    <tr>
+                     <th>Circle</th>
+                     <th>Division</th>
+                     <th>Class</th>
+                     <th>Race Number</th>
+                     <th>Sail Number</th>
+                     <th>Yacht Name</th>
+                     <th>Score</th>
+                     <th>Elapsed Time</th>                                                                                                   
+                     <th>Corrected Time</th>
+                   </tr>
+                 </thead>
+               </table>
+	  </div>
+     </div>
+   </div>
+   
+   <div class="row">
+   <div class="col">
+   <p id="caption" class="text-center"></p>
+   </div>
+   </div>
+
+  </div>
+
+<script>
+
+var results_table=undefined;
+var races = new Set();
+var show_multiple_races = false;
+
+$(document).ready(function() {
+	$('#ysevent-table').DataTable({
+		data: [],
+		order: [ [2, 'desc'] ],
+		select: 'single',
+    		columns: [
+			{ data: 'id' },
+	    		{ data: 'name' },
+			{ data: 'start_date', render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'oa' }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No events available" }, 
+		searching: false,
+	});
+
+	$('#csevent-table').DataTable({
+		data: [],
+		order: [ [2, 'desc'] ],
+		select: 'single',
+    		columns: [
+			{ data: 'id' },
+	    		{ data: 'name' },
+			{ data: 'start_date', render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'oa' }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No events available" }, 
+		searching: false,
+	});
+
+	$('#rmevent-table').DataTable({
+		data: [],
+		order: [ [2, 'desc'] ],
+		select: 'single',
+    		columns: [
+			{ data: 'id', width:"10%" },
+	    		{ data: 'name' },
+			{ data: 'start_date', width: "15%",
+				render: DataTable.render.datetime('MMM D, YYYY') },
+			{ data: 'oa', width: "10%" }
+		],
+    		rowId: 'id',
+    		pageLength: 10,
+		lengthChange: false,
+    		language: { emptyTable: "No events available" }, 
+		searching: true,
+	});
+	
+	const table_pos = $('#results-table').offset();
+	const window_h = $(window).height();
+
+	results_table = $('#results-table').DataTable({
+	     data: [],
+	     order: [ [0, 'asc'], [1, 'asc'], [2, 'asc'], [3, 'asc'], [ 6, 'asc'], [5, 'asc' ] ],
+	     ordering: { indicators: false },
+    	 columns: [
+		{ data: 'entry.racing_circle', orderable:false },
+		{ data: 'entry.racing_division', orderable:false },
+		{ data: 'entry.racing_class', orderable:false },
+		{ data: 'race.race_number', orderable:false },
+		{ data: 'entry.sail_number', orderable:false },
+	    { data: 'entry.name', orderable:false },
+		{ data: 'points', render: displayStatus, orderable:false },
+		{ data: 'elapsed_time', render: displayDuration, orderable:false },
+		{ data: 'corrected_time', render: displayDuration, orderable:false }
+	     ],
+	     columnDefs: [ { className: 'dt-center', targets: [3,6,7,8] },
+	    	 { className: 'dt-left', targets: [ 0, 1, 2, 4, 5 ]} ],
+    	 rowId: 'id',
+    	     language: {
+        	emptyTable: "No results loaded"
+      	     },
+	     rowGroup: { dataSrc: groupResults, startRender: groupLabel },
+	     scrollY: ( window_h - (table_pos.top + 250) ) + "px",
+	     deferRender: true,
+	     scroller: true,
+	     layout: {	 topEnd: ''  }
+	});
+});
+
+var this_event;
+
+function groupResults( rowData, level ) {
+	const group = [];
+	if ( rowData.entry.racing_cicle !== "" ) 
+		group.push(rowData.entry.racing_circle);
+	if ( rowData.entry.racing_division !== "" ) 
+		group.push(rowData.entry.racing_division);
+	group.push( rowData.entry.racing_class, rowData.race.race_number);
+	return JSON.stringify(group);
+}
+
+function groupLabel(rows, group, level) {
+	if ( group == undefined || group == "No group" ) {
+		return group;
+	} else {
+		const vals = JSON.parse(group);
+		let this_label = vals.length == 2 ? vals[0] : vals.slice(0, -1).join(" - ");
+		return show_multiple_races ? (this_label + ": Race " + vals[vals.length - 1]) : this_label;
+	}
+}
+
+function loadEvent(ev) {
+	this_event = ev;
+	results_table.clear().draw();
+	$('#event_title').html(ev.name);
+	const date_diff = ( ev.end_date - ev.start_date ) / ( 1000 * 3600 * 24);
+	const options = { weekday: "long", year: "numeric", month: "long", day: "numeric", };
+	if ( date_diff >= 1 ) {
+		$('#event_details').html(ev.start_date.toLocaleDateString(undefined, options) + " - " + 
+			ev.end_date.toLocaleDateString(undefined, options) + "<br>" + ev.oa);
+	} else {
+		$('#event_details').html(ev.start_date.toLocaleDateString(undefined, options) + "<br>" + ev.oa);
+	}
+	// Clear the races set
+	races.clear();
+	ev.getResults( loadResults );
+	const now = new Date().toLocaleString();
+	$('#caption').html("Results loaded " + now);	
+}
+
+// Function to reload the results data
+function reloadEventData() {
+	// Clear the races set
+	races.clear();
+	results_table.clear().draw();
+	this_event.getResults( loadResults );
+	const now = new Date().toLocaleString();
+	$('#caption').html("Results loaded " + now);
+}
+
+function loadResults(results) {
+	results.forEach( parseResult );
+	$('#races').empty();
+	const race_sel = $('#races');
+	Array.from(races).sort().forEach( (r) => {
+		race_sel.append(`<option selected>${r}</option>`);
+	});
+	show_multiple_races = races.size > 1;
+	results_table.draw();
+}
+
+function parseResult(result) {
+	races.add(result.race.race_number);
+	results_table.row.add(result);
+}
+
+function runYSSearch() {
+	query = $('#ys-search').val();
+	const ystable = $('#ysevent-table').DataTable()
+	ystable.clear();
+	YSEvent.search(query, 1, (events) => { 
+		ystable.rows.add(events);
+		ystable.columns.adjust().draw();
+	});
+}
+
+function runCSSearch() {
+	query = $('#cs-search').val();
+	const cstable = $('#csevent-table').DataTable();
+	cstable.clear();
+	CSEvent.search(query, (events) => { 
+		cstable.rows.add(events); 
+		cstable.columns.adjust().draw();
+	});
+}
+
+function displayRMDialog() { 
+	$('#rmevents').modal('show'); 
+	setTimeout( () => { RMEvent.loadTable($('#rmevent-table').DataTable()); }, 500 );
+}
+
+function selectYSEvent() {
+	const selrows = $('#ysevent-table').DataTable().rows({ selected: true }).data()
+	const ev = selrows[0];
+	loadEvent(ev);
+	$('#ysevents').modal('hide');
+	$('#ysevent-table').DataTable().clear().draw();
+}
+
+function selectCSEvent() { 
+	const selrows = $('#csevent-table').DataTable().rows({ selected: true }).data()	
+	const ev = selrows[0];
+	loadEvent(ev);
+	$('#csevents').modal('hide');
+	$('#csevent-table').DataTable().clear().draw();
+}
+
+function selectRMEvent() { 
+	const selrows = $('#rmevent-table').DataTable().rows({ selected: true }).data()	
+	const ev = selrows[0];
+	loadEvent(ev);
+	$('#rmevents').modal('hide');
+	$('#rmevent-table').DataTable().clear().draw();
+}
+
+function clearTables() { 
+	$('#clearData').modal('hide');
+	results_table.clear().draw();
+	$('#start_button').removeClass('disabled');
+	$('#stop_button').addClass('disabled');
+	clearInterval(scrollTimer);
+	scrollTimer = undefined;
+}
+
+var scrollTimer = undefined;
+var reloadTimer = undefined;
+
+// Function to start scrolling of the results table
+function startScroll() {
+	$('#startScroll').modal('hide');
+	// Set to the first row.
+	results_table.scroller.toPosition(0, false);
+	// Set the column visibility
+	const cols_visible = [];
+	const cols_hidden = [];
+	$('input[name="display_col"]').each( function () { 
+		$(this).prop("checked") ? cols_visible.push($(this).val()) : cols_hidden.push($(this).val());
+	});
+	results_table.columns(cols_visible).visible(true);
+	results_table.columns(cols_hidden).visible(false);
+	
+	// Subset the table to the selected races.
+	var sel_races = $('#races').val();
+	show_multiple_races = sel_races.length > 1;
+	results_table.search(function (d, row, idx) { return sel_races.indexOf(row.race.race_number.toString()) != -1; }).draw();	
+	
+	// Get the scrolling interval and set the timer
+	const scroll_int = parseFloat($('#scroll_int').val()) * 1000;
+	scrollTimer = setInterval(scrollTable, scroll_int);
+	
+	// Check if there is a reload interval, and set that timer
+	const reload_str = $('#reload_int').val();
+	if ( reload_str !== "" && reload_str !== "0" ) {
+		const reload_int = parseInt(reload_str) * 60 * 1000
+		reloadTimer = setInterval(reloadEventData, reload_int);		
+	}
+	
+	$('#start_button').addClass('disabled');
+	$('#stop_button').removeClass('disabled');
+}
+
+function stopScroll() {
+	$('#stopScroll').modal('hide');
+	clearInterval(scrollTimer);
+	scrollTimer = undefined;
+	if ( reloadTimer != undefined ) {
+		clearInterval(reloadTimer);
+		reloadTimer = undefined;
+	}
+	$('#start_button').removeClass('disabled');
+	$('#stop_button').addClass('disabled');
+}
+
+function scrollTable() { 
+	const posn = results_table.scroller.page();
+	if ( posn.end == (results_table.rows().count() - 1) ) {
+		clearInterval(scrollTimer);
+		const scroll_int = parseFloat($('#scroll_int').val()) * 1000 * (posn.end - posn.start);
+		scrollTimer = setTimeout(resetScroll, scroll_int);
+	} else
+		results_table.scroller.toPosition(posn.start + 1);
+}
+
+function resetScroll() { 
+	results_table.scroller.toPosition(0, false);
+	const scroll_int = parseFloat($('#scroll_int').val()) * 1000;
+	scrollTimer = setInterval(scrollTable, scroll_int);	
+}
+
+
+function displayStatus(data, type, row, meta) {
+	if ( type == "display" ) { 
+		if ( row.status == undefined || row.status == "" || row.status == "AOK" ) {
+			return row.points;
+		} else {
+			return row.status + " (" + row.points + ")";
+		}
+	} else {
+		return row.points;
+	}
+}
+function displayDuration(data, type, row, meta) {
+	if ( type == "display" ) { 
+		if (data.asSeconds() == 0) {
+			return "-";
+		}
+		let duration_string = data.minutes().toString().padStart(2, "0") + ":" + data.seconds().toString().padStart(2, "0");
+		if ( data.hours() >= 1 )
+			duration_string = data.hours().toString().padStart(2, "0") + ":" + duration_string;
+		if ( data.days() >= 1 )
+			duration_string = data.days() + ":" + duration_string;
+		return duration_string;
+	} else {
+		return data.asSeconds();
+	}
+}
+
+</script>
+
+</body>
+</html>
