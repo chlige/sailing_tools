@@ -403,7 +403,7 @@ var this_event;
 
 function groupResults( rowData, level ) {
 	const group = [];
-	if ( rowData.entry.racing_cicle !== "" ) 
+	if ( rowData.entry.racing_circle !== "" ) 
 		group.push(rowData.entry.racing_circle);
 	if ( rowData.entry.racing_division !== "" ) 
 		group.push(rowData.entry.racing_division);
@@ -417,7 +417,8 @@ function groupLabel(rows, group, level) {
 	} else {
 		const vals = JSON.parse(group);
 		let this_label = vals.length == 2 ? vals[0] : vals.slice(0, -1).join(" - ");
-		return show_multiple_races ? (this_label + ": Race " + vals[vals.length - 1]) : this_label;
+		return this_label + ": Race " + vals[vals.length - 1];
+		// return show_multiple_races ? (this_label + ": Race " + vals[vals.length - 1]) : this_label;
 	}
 }
 
@@ -575,9 +576,9 @@ function stopScroll() {
 
 function scrollTable() { 
 	const posn = results_table.scroller.page();
-	if ( posn.end == (results_table.rows().count() - 1) ) {
+	if ( posn.end == (results_table.rows({search:'applied'}).count() - 1) ) {
 		clearInterval(scrollTimer);
-		const scroll_int = parseFloat($('#scroll_int').val()) * 1000 * (posn.end - posn.start);
+		const scroll_int = 1000 * (posn.end - posn.start);
 		scrollTimer = setTimeout(resetScroll, scroll_int);
 	} else
 		results_table.scroller.toPosition(posn.start + 1);
