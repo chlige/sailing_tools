@@ -490,7 +490,10 @@ class RMEvent extends Regatta {
 			fleet_info.division.series.name, fleet_info.division.name, fleet_info.name);
 		return a_res.raceResults.map( (res_item, i) => {
 			if (! (i in fleet_info.races) ) {
-				fleet_info.races[i] = new Race(this, i + 1, "");
+                                let distance = ( res_item.courseLength != null ? res_item.courseLength.match(/Length\(([0-9\.]+),(\w+)\)/)[1] : '' );
+				fleet_info.races[i] = new Race(this, i + 1, distance,
+						{ name: res_item.raceName, 
+					          distance: res_item.courseLength } );
 			}
 			return new RMResult(entry, fleet_info.races[i], res_item);
 		});
@@ -519,7 +522,4 @@ class RMResult extends Result {
 			data.points, data.status, data);
 
 	}
-
-
-
 }
