@@ -327,7 +327,7 @@
       <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
           <div class="modal-header">
-		  <h5 class="modal-title">MWPHRF Validator v1.0</h5>
+		  <h5 class="modal-title">MWPHRF Validator v1.1</h5>
 		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	  </div>
           <div class="modal-body">
@@ -389,8 +389,6 @@
 var mwphrf_data = { by_name: {}, by_sail: {}, by_makemodel: {}, all_data: []};
 
 $(document).ready(function() {
-
-
 	$('#ysevent-table').DataTable({
 		data: [],
 		order: [ [2, 'desc'] ],
@@ -485,10 +483,13 @@ $(document).ready(function() {
 	     		buttons: [ 
 	     	{ extend: 'colvis', text: 'Table columns' },
 		{ extend: 'searchPanes', text: 'Filters' },
-		{ extend: 'excel', filename: "MWPHRF Validator - Entries", title: "Entries" },
+		{ extend: 'copyHtml5', copySuccess: false, footer: false, title: '', 
+			exportOptions: { columns: ':visible'} },
+		{ extend: 'excel', filename: "MWPHRF Validator - Entries", title: "Entries",
+			exportOptions: { columns: ':visible'} },
 		{ extend: 'csvHtml5', text: 'TSV', extension: '.txt', filename: "MWPHRF Validator - Entries", 
-			fieldBoundary: '', fieldSeparator: '\t' },
-				{ extend: 'print', title: "Entries" } ] } },
+			fieldBoundary: '', fieldSeparator: '\t', exportOptions: { columns: ':visible'} },
+		{ extend: 'print', title: "Entries" } ] } },
 	     language: { searchPanes: { collapse: "Filters", loadMessage: "" }}
 	});
 
