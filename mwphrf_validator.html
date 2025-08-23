@@ -653,7 +653,7 @@ function showSelectCert(row_idx) {
 	cert_table.clear();
 	var sel_cert = undefined;
 	var curr_row = 0;
-	curr_entry.mwphrf_matches.values().forEach( (item) => {
+	curr_entry.mwphrf_matches.forEach( (item, key) => {
 		cert_table.row.add(item);
 		if ( item === curr_entry.mwphrf_selected ) sel_cert = curr_row;
 		curr_row++;
@@ -691,10 +691,16 @@ function findMWPHRFMatch() {
 }
 
 function makeMWPHRFMatch(entry, match_types, match_method, current_year=false) {
-	if ( match_method == "skip" && entry.mwphrf_matches.size > 0 ) 
+	if ( match_method == "skip" && entry.mwphrf_matches.size > 0 ) {
+		complete++;
 		return;
-	if ( match_method == "overwrite" ) 
+	}
+
+	if ( match_method == "overwrite" ) {
 		entry.mwphrf_matches.clear();
+		entry.mwphrf_selected = null;
+		entry.is_valid = false;
+	}
 
 	match_types.forEach( (a_type) => { 
 		switch (a_type) { 
@@ -760,7 +766,3 @@ function setMWPHRFVar() {
 
 </body>
 </html>
-
-
-
-
