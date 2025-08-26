@@ -535,7 +535,7 @@ function loadEvent(ev) {
 }
 
 function parseEntry(entry) {
-	entry.mwphrf_matches = new MapSet();
+	entry.mwphrf_matches = new CertSet();
 	entry.mwphrf_selected = null;
 	entry.mwphrf_var = null;
 	entry.is_valid = false;
@@ -683,7 +683,7 @@ function findMWPHRFMatch() {
 	const entries = $('#entry-table').DataTable().rows({search: 'applied'}).data();
 	$('input[name="mwphrf-match"]:checked').each( function () { match_types.push($(this).val()); });
 	const match_method = $('#mwphrf-match-method').val();
-	const current_year = $('#mwphrf-year').val() === "current";
+	const current_year = $('#match-year').is(':checked');
 	const entry_len = entries.length;
 	todo = entry_len * match_types.length;
 	complete = 0;
@@ -708,7 +708,7 @@ function makeMWPHRFMatch(entry, match_types, match_method, current_year=false) {
 			(matches) => { addMWPHRFMatch(entry, matches, current_year) }, true);
 			break;
 		case "name": searchMWPHRF(a_type, entry.name,
-			(matches) => { addMWPHRFMatch(entry, matches, current_year) });
+			(matches) => { addMWPHRFMatch(entry, matches, current_year) }, true);
 			break;
 		case "type": searchMWPHRF(a_type, entry.design,
 			(matches) => { addMWPHRFMatch(entry, matches, current_year) });

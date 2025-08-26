@@ -13,7 +13,7 @@ const MWPHRF_QUERY_TYPES = {
 	MAKE_MODEL: 'model'
 }
 
-class MapSet extends Map {
+class CertSet extends Map {
 
 	constructor(...args) {
 		super();
@@ -23,17 +23,17 @@ class MapSet extends Map {
 	}
 
 	add(elem) { 
-		return ( ! this.has(elem) ) ? this.set(JSON.stringify(elem), elem) : this;
+		return ( ! this.has(elem) ) ? this.set(elem.certificateUrl, elem) : this;
 	}
 
 	has(elem) {
 		if (typeof elem !== 'object') return super.has(elem);
-		return super.has(JSON.stringify(elem));
+		return super.has(elem.certificateUrl);
 	}
 
 	delete(elem) { 
 		if (typeof elem !== 'object') return super.delete(elem);
-		return super.delete(JSON.stringify(elem));
+		return super.delete(elem.certificateUrl);
 	}
 
 }
@@ -86,7 +86,8 @@ function searchMWPHRF(queryType, queryValue, callback, exactMatch=false) {
 							results = results.filter((item) => item.sailNo === queryValue);
 							break;
 						case 'name':
-							results = results.filter((item) => item.yachtName === queryValue);
+							queryValue = queryValue.toLowerCase();
+							results = results.filter((item) => item.yachtName.toLowerCase() === queryValue);
 							break;
 						case 'type':
 							results = results.filter((item) => item.makeModel === queryValue);
