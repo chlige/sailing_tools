@@ -724,7 +724,7 @@ function addMWPHRFMatch(entry, matches, current_year=false) {
 			const this_year = new Date().getFullYear().toString();
 			matches.forEach( (item) => { if ( item.validFor.toString() === this_year ) entry.mwphrf_matches.add(item); });
 		} else {
-			entry.mwphrf_matches.add(...matches);
+			matches.forEach( (item) => { entry.mwphrf_matches.add(item); });
 		}
 		// If there is only one match, then set it as the selected one.
 		if ( entry.mwphrf_matches.size == 1 ) {
